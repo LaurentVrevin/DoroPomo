@@ -59,7 +59,6 @@ fun RoundTimerButton(
 @Composable
 @Preview(showBackground = true)
 fun RoundButtonPreview() {
-
     RoundTimerButton(
         mainText = "25:00",
         actionText = "Play",
