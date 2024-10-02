@@ -7,7 +7,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-// Couleurs pour le mode sombre
+//Dark Mode colors
 private val DarkColorScheme = darkColorScheme(
     primary = DarkPrimary,
     secondary = DarkSecondary,
@@ -19,7 +19,7 @@ private val DarkColorScheme = darkColorScheme(
     onSurface = DarkOnSurface
 )
 
-// Couleurs pour le mode clair
+//Light Mode colors
 private val LightColorScheme = lightColorScheme(
     primary = LightPrimary,
     secondary = LightSecondary,
@@ -34,7 +34,7 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun DoropomoTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(), // Gère automatiquement le mode sombre si le paramètre est activé dans le système
+    darkTheme: Boolean = isSystemInDarkTheme(), //Manage the theme with Boolean "darkTheme"
     content: @Composable () -> Unit
 ) {
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme

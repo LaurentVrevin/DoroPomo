@@ -1,6 +1,5 @@
 package com.laurentvrevin.doropomo.presentation.screens
 
-import androidx.annotation.RawRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

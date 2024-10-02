@@ -17,7 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun RoundTimerButton(
+fun StartPauseTimerButton(
     mainText: String,          // ex: 25:00
     actionText: String,        // ex: play or pause
     buttonColor: Color = MaterialTheme.colorScheme.primary,
@@ -59,7 +59,7 @@ fun RoundTimerButton(
 @Composable
 @Preview(showBackground = true)
 fun RoundButtonPreview() {
-    RoundTimerButton(
+    StartPauseTimerButton(
         mainText = "25:00",
         actionText = "Play",
         onClick = { }

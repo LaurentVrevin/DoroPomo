@@ -9,6 +9,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.laurentvrevin.doropomo.ui.theme.ButtonStyles
 
 
 @Composable
@@ -19,9 +20,8 @@ fun SettingsButton(
     FilledIconButton(
         onClick = onClick,
         modifier = modifier,
-        colors = androidx.compose.material3.IconButtonDefaults.filledIconButtonColors(
-            containerColor = MaterialTheme.colorScheme.primary // background button color
-        )
+        colors = ButtonStyles.primaryIconButtonColors()
+
     ) {
         Icon(
             imageVector = Icons.Default.Settings,
