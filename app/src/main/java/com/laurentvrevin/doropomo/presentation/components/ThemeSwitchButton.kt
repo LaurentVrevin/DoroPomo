@@ -8,7 +8,7 @@ import com.laurentvrevin.doropomo.ui.theme.ButtonStyles.primarySwitchColors
 
 
 @Composable
-fun ThemeSwitcher(
+fun ThemeSwitchButton(
     modifier: Modifier = Modifier,
     isDarkTheme: Boolean,
     onThemeSwitch: () -> Unit

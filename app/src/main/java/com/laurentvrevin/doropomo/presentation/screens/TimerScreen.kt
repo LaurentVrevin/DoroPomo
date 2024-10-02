@@ -14,11 +14,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.laurentvrevin.doropomo.R
-import com.laurentvrevin.doropomo.presentation.components.RoundTimerButton
 import com.laurentvrevin.doropomo.presentation.components.SettingsButton
-import com.laurentvrevin.doropomo.presentation.components.ThemeSwitcher
+import com.laurentvrevin.doropomo.presentation.components.StartPauseTimerButton
+import com.laurentvrevin.doropomo.presentation.components.ThemeSwitchButton
+import com.laurentvrevin.doropomo.ui.theme.Dimens
 
 
 @Composable
@@ -35,7 +35,7 @@ fun TimerScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(Dimens.globalPaddingMedium)
                 .background(color = Color.Gray),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -46,16 +46,16 @@ fun TimerScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    ThemeSwitcher(
+                    ThemeSwitchButton(
                         isDarkTheme = isDarkTheme,
                         onThemeSwitch = onThemeSwitch,
                         modifier = Modifier
-                            .padding(16.dp)
+                            .padding(Dimens.Button.paddingMedium)
                     )
                     SettingsButton(
                         onClick = onClick,
                         modifier = Modifier
-                            .padding(16.dp)
+                            .padding(Dimens.Button.paddingMedium)
                     )
                 }
             }
@@ -63,11 +63,11 @@ fun TimerScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(Dimens.globalPaddingMedium),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            RoundTimerButton(
+            StartPauseTimerButton(
                 mainText = "25:00",
                 actionText = stringResource(id = R.string.round_timer_button_play),
                 onClick = { }
