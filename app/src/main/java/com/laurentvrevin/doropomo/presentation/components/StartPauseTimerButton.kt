@@ -1,5 +1,6 @@
 package com.laurentvrevin.doropomo.presentation.components
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -15,9 +16,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.laurentvrevin.doropomo.ui.theme.Dimens
+import com.laurentvrevin.doropomo.ui.theme.TextDimens
 
 @Composable
 fun StartPauseTimerButton(
+    modifier:Modifier = Modifier,
+    verticalArrangement: Arrangement.Vertical,
     mainText: String,          // ex: 25:00
     actionText: String,        // ex: play or pause
     buttonColor: Color = MaterialTheme.colorScheme.primary,
@@ -27,41 +32,29 @@ fun StartPauseTimerButton(
 ) {
     Button(
         onClick = onClick,
-        modifier = Modifier
+        modifier = modifier
             .size(250.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = buttonColor)
+        colors = ButtonDefaults.buttonColors(containerColor = buttonColor),
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-
             Text(
                 text = mainText,
                 style = MaterialTheme.typography.displayLarge,
                 color = mainTextColor
             )
-
             Text(
                 text = actionText,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold,
                 color = actionTextColor,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(0.dp, 0.dp, 0.dp, 16.dp)
+                    .padding(Dimens.globalPaddingMedium)
             )
         }
     }
-}
-
-@Composable
-@Preview(showBackground = true)
-fun RoundButtonPreview() {
-    StartPauseTimerButton(
-        mainText = "25:00",
-        actionText = "Play",
-        onClick = { }
-    )
 }
