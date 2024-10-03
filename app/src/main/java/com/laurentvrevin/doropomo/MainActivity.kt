@@ -24,7 +24,7 @@ class MainActivity : ComponentActivity() {
                 TimerScreen(
                     isDarkTheme = isDarkTheme,
                     onThemeSwitch = { isDarkTheme = !isDarkTheme },
-                    progression = 0.7f,
+                    progression = 1f,
                     onClick = { }
                 )
             }

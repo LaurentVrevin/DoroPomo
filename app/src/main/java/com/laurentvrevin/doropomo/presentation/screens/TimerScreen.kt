@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,6 +25,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 
 import com.laurentvrevin.doropomo.R
+import com.laurentvrevin.doropomo.presentation.components.CircleProgressIndicator
 import com.laurentvrevin.doropomo.presentation.components.CustomTextButton
 import com.laurentvrevin.doropomo.presentation.components.SettingsButton
 import com.laurentvrevin.doropomo.presentation.components.StartPauseTimerButton
@@ -55,7 +57,6 @@ fun TimerScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
-
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -74,21 +75,37 @@ fun TimerScreen(
                         modifier = Modifier.padding(Dimens.Button.paddingMedium)
                     )
                 }
+
                 Box(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
-                    StartPauseTimerButton(
+                    Box(
                         modifier = Modifier
-                            .padding(Dimens.Button.paddingMedium),
-                        mainText = "25:00",
-                        actionText = stringResource(id = R.string.round_timer_button_play),
-                        onClick = { },
-                        verticalArrangement = Arrangement.Center,
-                    )
+                            .padding(Dimens.globalPaddingLarge)
+                            .aspectRatio(1f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircleProgressIndicator(
+                            progression = progression,
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            strokeWidth = Dimens.globalPaddingMedium
+                        )
+
+                        StartPauseTimerButton(
+                            modifier = Modifier
+                                .padding(Dimens.globalPaddingLarge),
+                            mainText = "25:00",
+                            actionText = stringResource(id = R.string.round_timer_button_play),
+                            onClick = { },
+                            verticalArrangement = Arrangement.Center,
+                        )
+                    }
                 }
+
                 CustomTextButton(
                     modifier = Modifier
                         .padding(Dimens.Button.paddingMedium),
@@ -97,6 +114,7 @@ fun TimerScreen(
                     text = "Stop",
                     onClick = {}
                 )
+
                 Spacer(modifier = Modifier.height(Dimens.globalPaddingExtraLarge))
             }
         }

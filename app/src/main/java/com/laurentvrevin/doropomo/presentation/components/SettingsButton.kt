@@ -20,7 +20,7 @@ fun SettingsButton(
 ){
     FilledIconButton(
         onClick = onClick,
-        modifier = Modifier.padding(Dimens.Button.paddingMedium),
+        //modifier = Modifier.padding(Dimens.Button.paddingMedium),
         colors = ButtonStyles.primaryIconButtonColors()
 
     ) {
