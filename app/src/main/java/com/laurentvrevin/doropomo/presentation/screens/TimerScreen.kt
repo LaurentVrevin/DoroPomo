@@ -124,7 +124,7 @@ fun TimerBody(
                     .padding(Dimens.globalPaddingLarge),
                 mainText = "25:00",
                 actionText = stringResource(id = R.string.round_timer_button_play),
-                onClick = { /* Logique de démarrage ou de pause */ },
+                onClick = { TODO() },
                 verticalArrangement = Arrangement.Center,
             )
         }
