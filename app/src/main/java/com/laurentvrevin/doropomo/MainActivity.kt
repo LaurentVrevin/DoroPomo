@@ -10,7 +10,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.laurentvrevin.doropomo.presentation.screens.TimerScreen
 import com.laurentvrevin.doropomo.ui.theme.DoropomoTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,9 +25,7 @@ class MainActivity : ComponentActivity() {
             DoropomoTheme(darkTheme = isDarkTheme) {
                 TimerScreen(
                     isDarkTheme = isDarkTheme,
-                    onThemeSwitch = { isDarkTheme = !isDarkTheme },
-                    progression = 1f,
-                    onClick = { }
+                    onThemeSwitch = { isDarkTheme = !isDarkTheme }
                 )
             }
         }

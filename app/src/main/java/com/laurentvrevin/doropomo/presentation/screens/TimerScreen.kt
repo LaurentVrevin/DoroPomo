@@ -1,85 +1,76 @@
 package com.laurentvrevin.doropomo.presentation.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import com.laurentvrevin.doropomo.R
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.laurentvrevin.doropomo.presentation.components.CircleProgressIndicator
 import com.laurentvrevin.doropomo.presentation.components.CustomTextButton
 import com.laurentvrevin.doropomo.presentation.components.SettingsButton
 import com.laurentvrevin.doropomo.presentation.components.StartPauseTimerButton
 import com.laurentvrevin.doropomo.presentation.components.ThemeSwitchButton
+import com.laurentvrevin.doropomo.presentation.viewmodel.DoroPomoViewModel
 import com.laurentvrevin.doropomo.ui.theme.Dimens
 
 @Composable
 fun TimerScreen(
     isDarkTheme: Boolean,
     onThemeSwitch: () -> Unit,
-    progression: Float,
-    onClick: () -> Unit
 ) {
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
+    val viewModel: DoroPomoViewModel = hiltViewModel()
+    val timerState by viewModel.timerState
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(Dimens.globalPaddingExtraLarge),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceBetween
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Blue)
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(Dimens.globalPaddingExtraLarge),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceBetween
-            ) {
-                // Header
-                TimerHeader(
-                    isDarkTheme = isDarkTheme,
-                    onThemeSwitch = onThemeSwitch,
-                    onClick = onClick
-                )
+        // Header
+        TimerHeader(
+            isDarkTheme = isDarkTheme,
+            onThemeSwitch = onThemeSwitch,
+            onSettingButtonClick = {  }
+        )
 
-                // Body
-                TimerBody(progression)
+        // Body
+        TimerBody(
+            progression = timerState.remainingTime / (timerState.workDuration.toFloat()),
+            remainingTime = timerState.remainingTime,
+            onStartPauseClick = {
+                if (timerState.isRunning) {
+                    viewModel.pauseTimer()
+                } else {
+                    viewModel.startTimer()
+                }
+            },
+            isRunning = timerState.isRunning
+        )
 
-                // Footer
-                TimerFooter(
-                    onStopClick = onClick
-                )
-            }
-        }
+        // Footer
+        TimerFooter(
+            onStopClick = { viewModel.resetTimer() }
+        )
     }
 }
 
-//Header with theme switch and settings button
+// Header with ThemeSwitchButton and SettingsButton
 @Composable
 fun TimerHeader(
     isDarkTheme: Boolean,
     onThemeSwitch: () -> Unit,
-    onClick: () -> Unit
+    onSettingButtonClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .background(color = Color.Green),
+            .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -90,16 +81,19 @@ fun TimerHeader(
                 .padding(Dimens.Button.paddingMedium)
         )
         SettingsButton(
-            onClick = onClick,
+            onClick = onSettingButtonClick,
             modifier = Modifier.padding(Dimens.Button.paddingMedium)
         )
     }
 }
 
-// Body with circle progress indicator and start/pause button
+// Body with CircleProgressIndicator and StartPauseTimerButton
 @Composable
 fun TimerBody(
-    progression: Float
+    progression: Float,
+    remainingTime: Long,
+    onStartPauseClick: () -> Unit,
+    isRunning: Boolean
 ) {
     Box(
         modifier = Modifier
@@ -112,6 +106,7 @@ fun TimerBody(
                 .aspectRatio(1f),
             contentAlignment = Alignment.Center
         ) {
+
             CircleProgressIndicator(
                 progression = progression,
                 modifier = Modifier
@@ -119,19 +114,28 @@ fun TimerBody(
                 strokeWidth = Dimens.globalPaddingMedium
             )
 
+
             StartPauseTimerButton(
                 modifier = Modifier
                     .padding(Dimens.globalPaddingLarge),
-                mainText = "25:00",
-                actionText = stringResource(id = R.string.round_timer_button_play),
-                onClick = { TODO() },
+                mainText = formatTime(remainingTime),
+                actionText = if (isRunning) "Pause" else "Start",
+                onClick = onStartPauseClick,
                 verticalArrangement = Arrangement.Center,
             )
         }
     }
 }
 
-//Footer with stop button
+// FormatTime
+@Composable
+fun formatTime(timeInMillis: Long): String {
+    val minutes = (timeInMillis / 1000) / 60
+    val seconds = (timeInMillis / 1000) % 60
+    return "%02d:%02d".format(minutes, seconds)
+}
+
+// Footer with StopButton
 @Composable
 fun TimerFooter(
     onStopClick: () -> Unit
@@ -151,5 +155,3 @@ fun TimerFooter(
         Spacer(modifier = Modifier.height(Dimens.globalPaddingExtraLarge))
     }
 }
-
-
