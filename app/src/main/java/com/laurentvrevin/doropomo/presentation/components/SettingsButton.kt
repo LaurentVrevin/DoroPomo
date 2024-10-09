@@ -1,7 +1,6 @@
 package com.laurentvrevin.doropomo.presentation.components
 
 
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.FilledIconButton
@@ -10,7 +9,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.laurentvrevin.doropomo.ui.theme.ButtonStyles
-import com.laurentvrevin.doropomo.ui.theme.Dimens
 
 
 @Composable
@@ -20,7 +18,6 @@ fun SettingsButton(
 ){
     FilledIconButton(
         onClick = onClick,
-        //modifier = Modifier.padding(Dimens.Button.paddingMedium),
         colors = ButtonStyles.primaryIconButtonColors()
 
     ) {
