@@ -1,13 +1,12 @@
 package com.laurentvrevin.doropomo.presentation.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.laurentvrevin.doropomo.presentation.components.CircleProgressIndicator
@@ -20,11 +19,17 @@ import com.laurentvrevin.doropomo.ui.theme.Dimens
 
 @Composable
 fun TimerScreen(
-    isDarkTheme: Boolean,
-    onThemeSwitch: () -> Unit,
+    viewModel: DoroPomoViewModel = hiltViewModel(),
+    onSelectModeClick: () -> Unit
 ) {
-    val viewModel: DoroPomoViewModel = hiltViewModel()
+
     val timerState by viewModel.timerState
+
+    val isDarkTheme by viewModel.isDarkTheme
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
+    ){
 
     Column(
         modifier = Modifier
@@ -36,8 +41,8 @@ fun TimerScreen(
         // Header
         TimerHeader(
             isDarkTheme = isDarkTheme,
-            onThemeSwitch = onThemeSwitch,
-            onSettingButtonClick = {  }
+            onThemeSwitch = {viewModel.toggleTheme()},
+            onSettingButtonClick = { onSelectModeClick() }
         )
 
         // Body
@@ -59,6 +64,7 @@ fun TimerScreen(
             onStopClick = { viewModel.resetTimer() }
         )
     }
+}
 }
 
 // Header with ThemeSwitchButton and SettingsButton

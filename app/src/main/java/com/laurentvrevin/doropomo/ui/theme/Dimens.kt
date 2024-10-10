@@ -25,7 +25,8 @@ object Dimens {
         val paddingMedium = 16.dp // Standard button padding
         val paddingLarge = 24.dp // Larger padding for bigger buttons
 
-        val height = 48.dp // Standard button height
+        val heightSmall = 48.dp // Standard button height
+        val heightMedium = 60.dp // Small button height
         val widthSmall = 100.dp // Small button width
         val widthMedium = 200.dp // Medium button width
         val widthLarge = 300.dp // Large button width

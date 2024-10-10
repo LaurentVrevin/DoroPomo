@@ -24,6 +24,8 @@ class DoroPomoViewModel @Inject constructor(
 
     private val oneSecond: Long = 1000L
 
+    val isDarkTheme = mutableStateOf(false)
+
     // Initialize the timer with default values and `isRunning` set to `false`
     val timerState = mutableStateOf(
         TimerState(
@@ -88,5 +90,10 @@ class DoroPomoViewModel @Inject constructor(
     // Update the timer preferences
     fun updateTimerPreferences(workDuration: Long, breakDuration: Long) {
         timerState.value = setTimerPreferencesUseCase.execute(workDuration, breakDuration)
+    }
+
+    // Witch between dark and light theme
+    fun toggleTheme() {
+        isDarkTheme.value = !isDarkTheme.value
     }
 }
