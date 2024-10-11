@@ -22,15 +22,16 @@ class DoroPomoViewModel @Inject constructor(
     private val setTimerPreferencesUseCase: SetTimerPreferencesUseCase
 ) : ViewModel() {
 
+    private val updateInterval: Long = 50L
     private val oneSecond: Long = 1000L
 
     val isDarkTheme = mutableStateOf(false)
 
-    // Initialize the timer with default values and `isRunning` set to `false`
+    // Initialize timer state
     val timerState = mutableStateOf(
         TimerState(
             startTime = 0L,
-            remainingTime = 25 * 60 * 1000L,  // Default to 25 minutes
+            remainingTime = 25 * 60 * 1000L,
             workDuration = 25 * 60 * 1000L,
             breakDuration = 5 * 60 * 1000L,
             isRunning = false,
@@ -40,59 +41,65 @@ class DoroPomoViewModel @Inject constructor(
 
     private var timerJob: Job? = null
 
-    // Start the timer
+    // Démarrer le timer
     fun startTimer() {
-        // Check if the timer is already running, if so, do nothing
+        // Verify if timer is already running
         if (timerState.value.isRunning) return
 
-        // Start the timer with the current state of TimerState
+        // Update Timer
         timerState.value = startTimerUseCase.execute(timerState.value.remainingTime)
 
-        // Launch a coroutine to update the timer every second
+        timerJob?.cancel()  // Cancel all running timer before starting a new one
+
+        // Rune Coroutine to update timer
         timerJob = viewModelScope.launch {
-            val startTime = System.currentTimeMillis()
-            val initialRemainingTime = timerState.value.remainingTime
+            val initialStartTime = System.currentTimeMillis()
+            var lastUpdateTime = initialStartTime
 
             while (timerState.value.isRunning && timerState.value.remainingTime > 0) {
-                delay(oneSecond)  // Wait for 1 second
+                val currentTime = System.currentTimeMillis()
+                val elapsedTime = currentTime - lastUpdateTime
 
-                // Calculate the elapsed time
-                val elapsedTime = System.currentTimeMillis() - startTime
-                val newRemainingTime = initialRemainingTime - elapsedTime
+                // If a fully second has passed, update the timer
+                if (elapsedTime >= oneSecond) {
+                    val newRemainingTime = timerState.value.remainingTime - oneSecond
+                    timerState.value = timerState.value.copy(remainingTime = newRemainingTime)
+                    lastUpdateTime += oneSecond  // Update lastUpdateTime
+                }
 
-                // Update the timer state with the calculated remaining time
-                timerState.value = timerState.value.copy(remainingTime = newRemainingTime)
-
-                // Stop the timer if the time is up
-                if (newRemainingTime <= 0L) {
+                // If timer is up, stop it
+                if (timerState.value.remainingTime <= 0L) {
                     timerState.value = timerState.value.copy(
                         remainingTime = 0L,
                         isRunning = false
                     )
-                    timerJob?.cancel()  // Cancel the coroutine
+                    timerJob?.cancel()  // Cancel Coroutine
                 }
+
+                // Use mini delay instead of Thread.sleep
+                delay(updateInterval)
             }
         }
     }
 
-    // Pause the timer
+
     fun pauseTimer() {
-        timerJob?.cancel()  // Cancel the ongoing coroutine
+        timerJob?.cancel()
         timerState.value = pauseTimerUseCase.execute()
     }
 
-    // Reset the timer
+
     fun resetTimer() {
-        timerJob?.cancel()  // Cancel the ongoing coroutine
+        timerJob?.cancel()
         timerState.value = resetTimerUseCase.execute()
     }
 
-    // Update the timer preferences
+
     fun updateTimerPreferences(workDuration: Long, breakDuration: Long) {
         timerState.value = setTimerPreferencesUseCase.execute(workDuration, breakDuration)
     }
 
-    // Witch between dark and light theme
+
     fun toggleTheme() {
         isDarkTheme.value = !isDarkTheme.value
     }
