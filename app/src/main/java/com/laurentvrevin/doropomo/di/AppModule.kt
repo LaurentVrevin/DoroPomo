@@ -1,12 +1,11 @@
 package com.laurentvrevin.doropomo.di
 
 import android.content.Context
+import com.laurentvrevin.doropomo.data.repository.AlarmRepositoryImpl
 import com.laurentvrevin.doropomo.data.repository.TimerRepositoryImpl
+import com.laurentvrevin.doropomo.domain.repository.AlarmRepository
 import com.laurentvrevin.doropomo.domain.repository.TimerRepository
-import com.laurentvrevin.doropomo.domain.usecase.PauseTimerUseCase
-import com.laurentvrevin.doropomo.domain.usecase.ResetTimerUseCase
-import com.laurentvrevin.doropomo.domain.usecase.SetTimerPreferencesUseCase
-import com.laurentvrevin.doropomo.domain.usecase.StartTimerUseCase
+import com.laurentvrevin.doropomo.domain.usecase.*
 import com.laurentvrevin.doropomo.utils.PreferencesManager
 import dagger.Module
 import dagger.Provides
@@ -53,5 +52,21 @@ object AppModule {
     @Provides
     fun providePreferencesManager(@ApplicationContext context: Context): PreferencesManager {
         return PreferencesManager(context)
+    }
+
+    @Singleton
+    @Provides
+    fun provideAlarmRepository(alarmRepositoryImpl: AlarmRepositoryImpl): AlarmRepository = alarmRepositoryImpl
+
+    @Singleton
+    @Provides
+    fun providePlayAlarmUseCase(alarmRepository: AlarmRepository): PlayAlarmUseCase {
+        return PlayAlarmUseCase(alarmRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideStopAlarmUseCase(alarmRepository: AlarmRepository): StopAlarmUseCase {
+        return StopAlarmUseCase(alarmRepository)
     }
 }

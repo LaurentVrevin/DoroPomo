@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.laurentvrevin.doropomo.presentation.components.BreakPopup
 import com.laurentvrevin.doropomo.presentation.components.CircleProgressIndicator
 import com.laurentvrevin.doropomo.presentation.components.CustomTextButton
 import com.laurentvrevin.doropomo.presentation.components.SettingsButton
@@ -48,6 +49,18 @@ fun TimerScreen(
         viewModel.applySavedPreferences()
     }
 
+    // Affiche BreakPopup lorsque le temps de travail est écoulé
+    if (!timerState.isRunning && timerState.remainingTime <= 0) {
+        BreakPopup(
+            onDismiss = { viewModel.stopAlarm() },
+            onConfirm = {
+                viewModel.stopAlarm()
+                // Logique pour lancer la pause ici, par exemple, réinitialiser pour le temps de pause
+                viewModel.startBreak()
+            }
+        )
+    }
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
@@ -72,7 +85,7 @@ fun TimerScreen(
                     if (timerState.isRunning) {
                         viewModel.pauseTimer()
                     } else {
-                        viewModel.startTimer(context)
+                        viewModel.startTimer()
                     }
                 },
                 isRunning = timerState.isRunning
