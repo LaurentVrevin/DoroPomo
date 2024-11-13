@@ -13,6 +13,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.laurentvrevin.doropomo.domain.entity.PomodoroMode
+import com.laurentvrevin.doropomo.domain.entity.predefinedModes
 import com.laurentvrevin.doropomo.presentation.components.CycleSelector
 import com.laurentvrevin.doropomo.presentation.components.SelectableButton
 import com.laurentvrevin.doropomo.presentation.viewmodel.DoroPomoViewModel
@@ -22,51 +24,57 @@ import com.laurentvrevin.doropomo.ui.theme.Dimens
 fun SelectModeScreen(
     onBackClick: () -> Unit,
     onSaveClick: () -> Unit,
-    viewModel: DoroPomoViewModel = hiltViewModel()  // Utilisation du ViewModel
+    viewModel: DoroPomoViewModel = hiltViewModel()
 ) {
-    // Les états pour chaque section de l'écran
-    var selectedMode by remember { mutableStateOf("25/5") }
+    // Charger le mode sauvegardé depuis les préférences via le ViewModel
+    val savedMode = viewModel.timerState.value.run { PomodoroMode(workDuration, breakDuration, "${workDuration / 1000 / 60}/${breakDuration / 1000 / 60}") }
+    var selectedMode by remember { mutableStateOf(savedMode.label) }
+
     var numberOfCycles by remember { mutableIntStateOf(4) }
     var longBreakDuration by remember { mutableIntStateOf(15) }
     var dontDisturbMode by remember { mutableStateOf(false) }
 
     Surface(
-        modifier = Modifier.fillMaxSize(),  // Surface pour englober tout l'écran
-        color = MaterialTheme.colorScheme.background // Utilisation de la couleur de fond du thème
-    ){
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(Dimens.globalPaddingExtraLarge),
-        verticalArrangement = Arrangement.SpaceBetween,
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
     ) {
-        // En-tête de l'écran
-        HeaderSection(onBackClick)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(Dimens.globalPaddingExtraLarge),
+            verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            HeaderSection(onBackClick)
 
-        // Sélecteur des modes de travail / pause prédéfinis
-        ModeSelector(selectedMode, onModeSelected = { selectedMode = it })
+            // Sélecteur de mode
+            ModeSelector(
+                selectedMode = selectedMode,
+                onModeSelected = { selectedMode = it }
+            )
 
-        // Sélecteur du nombre de cycles avant la longue pause
-        CycleSelector(
-            numberOfCycles = numberOfCycles,
-            onIncrement = { numberOfCycles++ },
-            onDecrement = { if (numberOfCycles > 1) numberOfCycles-- }
-        )
+            // Configuration du cycle et autres paramètres
+            CycleSelector(
+                numberOfCycles = numberOfCycles,
+                onIncrement = { numberOfCycles++ },
+                onDecrement = { if (numberOfCycles > 1) numberOfCycles-- }
+            )
 
-        // Sélecteur de la durée de la longue pause
-        LongBreakTimeSelector(longBreakDuration) { longBreakDuration = it }
+            LongBreakTimeSelector(longBreakDuration) { longBreakDuration = it }
 
-        // Mode "Don't Disturb"
-        DontDisturbModeCheckbox(dontDisturbMode) { dontDisturbMode = it }
+            DontDisturbModeCheckbox(dontDisturbMode) { dontDisturbMode = it }
 
-        // Bouton pour personnaliser le timer
-        CustomizeTimerButton()
+            CustomizeTimerButton()
 
-        // Bouton pour sauvegarder les paramètres
-        SaveButton(onSaveClick)
+            SaveButton {
+                val selectedPomodoroMode = predefinedModes.firstOrNull { it.label == selectedMode }
+                if (selectedPomodoroMode != null) {
+                    viewModel.updateTimerPreferences(selectedPomodoroMode.workDuration, selectedPomodoroMode.breakDuration)
+                }
+                onSaveClick()
+            }
+        }
     }
-}
 }
 
 // En-tête de l'écran Settings
@@ -183,3 +191,4 @@ fun SaveButton(onSaveClick: () -> Unit) {
         Text(text = "Save", color = Color.White)
     }
 }
+

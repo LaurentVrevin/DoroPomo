@@ -13,11 +13,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.laurentvrevin.doropomo.ui.theme.Dimens
 import com.laurentvrevin.doropomo.ui.theme.TextDimens
+import com.laurentvrevin.doropomo.utils.vibrate
 
 @Composable
 fun StartPauseTimerButton(
@@ -28,10 +30,17 @@ fun StartPauseTimerButton(
     buttonColor: Color = MaterialTheme.colorScheme.primary,
     mainTextColor: Color = Color.White,
     actionTextColor: Color = Color.White,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    duration: Long = 50L
 ) {
+    val context = LocalContext.current
+
     Button(
-        onClick = onClick,
+        //adding vibration onClick
+        onClick = {
+            vibrate(context, duration)
+            onClick()
+                  },
         modifier = modifier
             .size(250.dp),
         colors = ButtonDefaults.buttonColors(containerColor = buttonColor),

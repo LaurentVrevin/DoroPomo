@@ -36,7 +36,7 @@ fun Navigation(
         composable(Screen.SelectModeScreen.route) {
             SelectModeScreen(
                 onBackClick = { navController.popBackStack() },
-                onSaveClick = { navController.popBackStack() }
+                onSaveClick = { navController.navigate(Screen.TimerScreen.route) }
             )
         }
     }

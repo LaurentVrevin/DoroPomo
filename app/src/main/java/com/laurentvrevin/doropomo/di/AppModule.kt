@@ -1,14 +1,17 @@
 package com.laurentvrevin.doropomo.di
 
+import android.content.Context
 import com.laurentvrevin.doropomo.data.repository.TimerRepositoryImpl
 import com.laurentvrevin.doropomo.domain.repository.TimerRepository
 import com.laurentvrevin.doropomo.domain.usecase.PauseTimerUseCase
 import com.laurentvrevin.doropomo.domain.usecase.ResetTimerUseCase
 import com.laurentvrevin.doropomo.domain.usecase.SetTimerPreferencesUseCase
 import com.laurentvrevin.doropomo.domain.usecase.StartTimerUseCase
+import com.laurentvrevin.doropomo.utils.PreferencesManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -44,5 +47,11 @@ object AppModule {
     @Provides
     fun provideSetTimerPreferencesUseCase(timerRepository: TimerRepository): SetTimerPreferencesUseCase {
         return SetTimerPreferencesUseCase(timerRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun providePreferencesManager(@ApplicationContext context: Context): PreferencesManager {
+        return PreferencesManager(context)
     }
 }
