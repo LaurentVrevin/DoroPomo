@@ -1,24 +1,22 @@
 package com.laurentvrevin.doropomo.presentation.screens
 
-import android.content.ContentValues.TAG
-import android.nfc.Tag
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.laurentvrevin.doropomo.presentation.components.BreakPopup
+import com.laurentvrevin.doropomo.domain.entity.TimerState
 import com.laurentvrevin.doropomo.presentation.components.CircleProgressIndicator
 import com.laurentvrevin.doropomo.presentation.components.CustomTextButton
 import com.laurentvrevin.doropomo.presentation.components.SettingsButton
@@ -26,40 +24,23 @@ import com.laurentvrevin.doropomo.presentation.components.StartPauseTimerButton
 import com.laurentvrevin.doropomo.presentation.components.ThemeSwitchButton
 import com.laurentvrevin.doropomo.presentation.viewmodel.DoroPomoViewModel
 import com.laurentvrevin.doropomo.ui.theme.Dimens
-import com.laurentvrevin.doropomo.utils.PreferencesManager
 
 
 @Composable
 fun TimerScreen(
     viewModel: DoroPomoViewModel = hiltViewModel(),
     onSelectModeClick: () -> Unit,
-    onModeSelected: Boolean = false
 ) {
+    // Observez le timerState et l'indicateur modeUpdated
+    val timerState by viewModel.timerState.collectAsState()
+
+    val workDuration = timerState.workDuration
+    val remainingTime = timerState.remainingTime
+    val cyclesBeforeLongBreak by viewModel.cyclesBeforeLongBreak.collectAsState()
+    val isRunning = timerState.isRunning
+
     val context = LocalContext.current
-    val preferencesManager = remember { PreferencesManager(context) }
-
-    val workDuration by remember { mutableLongStateOf(preferencesManager.getSavedPomodoroMode().workDuration) }
-    val breakDuration by remember { mutableLongStateOf(preferencesManager.getSavedPomodoroMode().breakDuration) }
-
-    val timerState by viewModel.timerState
     val isDarkTheme by viewModel.isDarkTheme
-
-    // Charger les préférences au démarrage de TimerScreen
-    LaunchedEffect(Unit) {
-        viewModel.applySavedPreferences()
-    }
-
-    // Affiche BreakPopup lorsque le temps de travail est écoulé
-    if (!timerState.isRunning && timerState.remainingTime <= 0) {
-        BreakPopup(
-            onDismiss = { viewModel.stopAlarm() },
-            onConfirm = {
-                viewModel.stopAlarm()
-                // Logique pour lancer la pause ici, par exemple, réinitialiser pour le temps de pause
-                viewModel.startBreak()
-            }
-        )
-    }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -80,15 +61,21 @@ fun TimerScreen(
 
             TimerBody(
                 progression = timerState.remainingTime / workDuration.toFloat(),
-                remainingTime = timerState.remainingTime,
+                remainingTime = remainingTime,
                 onStartPauseClick = {
-                    if (timerState.isRunning) {
+                    if (isRunning) {
                         viewModel.pauseTimer()
                     } else {
-                        viewModel.startTimer()
+                        viewModel.startTimer(context)
                     }
                 },
-                isRunning = timerState.isRunning
+                isRunning = isRunning
+            )
+            Spacer(modifier = Modifier.padding(16.dp))
+            Text(
+                text = "Cycles avant pause longue : $cyclesBeforeLongBreak",
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium
             )
 
             TimerFooter(
@@ -97,7 +84,6 @@ fun TimerScreen(
         }
     }
 }
-
 // Header with ThemeSwitchButton and SettingsButton
 @Composable
 fun TimerHeader(
@@ -124,7 +110,6 @@ fun TimerHeader(
     }
 }
 
-// Body with CircleProgressIndicator and StartPauseTimerButton
 @Composable
 fun TimerBody(
     progression: Float,
@@ -137,21 +122,18 @@ fun TimerBody(
             .fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
-
         Box(
             modifier = Modifier
                 .padding(Dimens.globalPaddingLarge)
                 .aspectRatio(1f),
             contentAlignment = Alignment.Center
         ) {
-
             CircleProgressIndicator(
                 progression = progression,
                 modifier = Modifier
                     .fillMaxSize(),
                 strokeWidth = Dimens.globalPaddingMedium
             )
-
 
             StartPauseTimerButton(
                 modifier = Modifier
@@ -161,17 +143,19 @@ fun TimerBody(
                 onClick = onStartPauseClick,
                 verticalArrangement = Arrangement.Center,
             )
+
         }
     }
 }
 
-// FormatTime
 @Composable
 fun formatTime(timeInMillis: Long): String {
     val minutes = (timeInMillis / 1000) / 60
     val seconds = (timeInMillis / 1000) % 60
     return "%02d:%02d".format(minutes, seconds)
 }
+
+
 
 // Footer with StopButton
 @Composable

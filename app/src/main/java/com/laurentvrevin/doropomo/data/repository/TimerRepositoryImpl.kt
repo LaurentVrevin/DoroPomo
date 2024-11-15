@@ -12,25 +12,24 @@ class TimerRepositoryImpl : TimerRepository {
         timerState = timerState.copy(
             startTime = startTimeInMillis,
             remainingTime = duration,
-            isRunning = true  // Indicate that the timer is running
+            isRunning = true
         )
         return timerState
     }
 
     override fun pauseTimer(): TimerState {
-        val currentTime = System.currentTimeMillis()
-        val elapsedTime = currentTime - timerState.startTime
+        val elapsedTime = System.currentTimeMillis() - timerState.startTime
         timerState = timerState.copy(
-            remainingTime = timerState.remainingTime - elapsedTime,  // Update the remaining time
-            isRunning = false  // Indicate that the timer is paused
+            remainingTime = timerState.remainingTime - elapsedTime,
+            isRunning = false
         )
         return timerState
     }
 
     override fun resetTimer(): TimerState {
         timerState = timerState.copy(
-            remainingTime = timerState.workDuration,  // Reset the remaining time to the work duration
-            isRunning = false,  // Indicate that the timer is reset
+            remainingTime = timerState.workDuration,
+            isRunning = false,
             isBreakTime = false
         )
         return timerState
@@ -44,8 +43,8 @@ class TimerRepositoryImpl : TimerRepository {
         timerState = timerState.copy(
             workDuration = workDuration,
             breakDuration = breakDuration,
-            remainingTime = workDuration,  // Update the remaining time to the new work duration
-            isRunning = false  // Ensure that the timer is stopped when updating preferences
+            remainingTime = workDuration,
+            isRunning = false
         )
         return timerState
     }

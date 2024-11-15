@@ -1,5 +1,7 @@
 package com.laurentvrevin.doropomo.presentation.screens
 
+import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -20,17 +22,19 @@ import com.laurentvrevin.doropomo.presentation.components.SelectableButton
 import com.laurentvrevin.doropomo.presentation.viewmodel.DoroPomoViewModel
 import com.laurentvrevin.doropomo.ui.theme.Dimens
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun SelectModeScreen(
     onBackClick: () -> Unit,
     onSaveClick: () -> Unit,
     viewModel: DoroPomoViewModel = hiltViewModel()
 ) {
-    // Charger le mode sauvegardé depuis les préférences via le ViewModel
     val savedMode = viewModel.timerState.value.run { PomodoroMode(workDuration, breakDuration, "${workDuration / 1000 / 60}/${breakDuration / 1000 / 60}") }
     var selectedMode by remember { mutableStateOf(savedMode.label) }
 
-    var numberOfCycles by remember { mutableIntStateOf(4) }
+    // Observez cyclesBeforeLongBreak via ViewModel
+    val numberOfCycles by viewModel.cyclesBeforeLongBreak.collectAsState()
+
     var longBreakDuration by remember { mutableIntStateOf(15) }
     var dontDisturbMode by remember { mutableStateOf(false) }
 
@@ -47,17 +51,23 @@ fun SelectModeScreen(
         ) {
             HeaderSection(onBackClick)
 
-            // Sélecteur de mode
             ModeSelector(
                 selectedMode = selectedMode,
                 onModeSelected = { selectedMode = it }
             )
 
-            // Configuration du cycle et autres paramètres
             CycleSelector(
                 numberOfCycles = numberOfCycles,
-                onIncrement = { numberOfCycles++ },
-                onDecrement = { if (numberOfCycles > 1) numberOfCycles-- }
+                onIncrement = {
+                    val updatedCycle = numberOfCycles + 1
+                    viewModel.updateCycleCount(updatedCycle)
+                },
+                onDecrement = {
+                    if (numberOfCycles > 1) {
+                        val updatedCycle = numberOfCycles - 1
+                        viewModel.updateCycleCount(updatedCycle)
+                    }
+                }
             )
 
             LongBreakTimeSelector(longBreakDuration) { longBreakDuration = it }
@@ -67,10 +77,9 @@ fun SelectModeScreen(
             CustomizeTimerButton()
 
             SaveButton {
-                val selectedPomodoroMode = predefinedModes.firstOrNull { it.label == selectedMode }
-                if (selectedPomodoroMode != null) {
-                    viewModel.updateTimerPreferences(selectedPomodoroMode.workDuration, selectedPomodoroMode.breakDuration)
-                }
+                val selectedPomodoroMode = predefinedModes.first { it.label == selectedMode }
+
+                viewModel.savePomodoroPreferences(selectedPomodoroMode, numberOfCycles)
                 onSaveClick()
             }
         }
@@ -191,4 +200,3 @@ fun SaveButton(onSaveClick: () -> Unit) {
         Text(text = "Save", color = Color.White)
     }
 }
-

@@ -6,16 +6,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.laurentvrevin.doropomo.domain.entity.PomodoroMode
 import com.laurentvrevin.doropomo.domain.entity.TimerState
-import com.laurentvrevin.doropomo.domain.usecase.PauseTimerUseCase
-import com.laurentvrevin.doropomo.domain.usecase.PlayAlarmUseCase
-import com.laurentvrevin.doropomo.domain.usecase.ResetTimerUseCase
-import com.laurentvrevin.doropomo.domain.usecase.SetTimerPreferencesUseCase
-import com.laurentvrevin.doropomo.domain.usecase.StartTimerUseCase
-import com.laurentvrevin.doropomo.domain.usecase.StopAlarmUseCase
+import com.laurentvrevin.doropomo.domain.usecase.*
 import com.laurentvrevin.doropomo.utils.PreferencesManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -33,8 +30,11 @@ class DoroPomoViewModel @Inject constructor(
     private val updateInterval: Long = 50L
     private val oneSecond: Long = 1000L
 
-    val isDarkTheme = mutableStateOf(false)
-    val timerState = mutableStateOf(
+    val isDarkTheme = mutableStateOf(false) // Gestion du thème
+
+    private var timerJob: Job? = null
+
+    private val _timerState = MutableStateFlow(
         TimerState(
             startTime = 0L,
             remainingTime = preferencesManager.getSavedPomodoroMode().workDuration,
@@ -44,49 +44,58 @@ class DoroPomoViewModel @Inject constructor(
             isBreakTime = false
         )
     )
+    val timerState: StateFlow<TimerState> = _timerState
 
-    private var timerJob: Job? = null
+    private val _cyclesBeforeLongBreak = MutableStateFlow(preferencesManager.getSavedCycles())
+    val cyclesBeforeLongBreak: StateFlow<Int> = _cyclesBeforeLongBreak
 
-    // Méthode pour charger les préférences sauvegardées
-    fun applySavedPreferences() {
-        val savedMode = preferencesManager.getSavedPomodoroMode()
-        timerState.value = timerState.value.copy(
-            workDuration = savedMode.workDuration,
-            breakDuration = savedMode.breakDuration,
-            remainingTime = savedMode.workDuration  // Reset remaining time for new mode
+    val showPopup = mutableStateOf(false)
+    val popupMessage = mutableStateOf("")
+
+    private var currentCycle = 0 // Compteur de cycles de travail effectués
+
+
+
+    init {
+        // Écouter les changements de préférences sauvegardées
+        viewModelScope.launch {
+            preferencesManager.getPomodoroModeFlow().collect { mode ->
+                updateTimerPreferences(mode.workDuration, mode.breakDuration, cyclesBeforeLongBreak.value)
+            }
+        }
+    }
+
+    //--- GESTION DES PRÉFÉRENCES ---//
+
+    fun updateCycleCount(newCycleCount: Int) {
+        _cyclesBeforeLongBreak.value = newCycleCount
+        preferencesManager.savePomodoroMode(
+            mode = preferencesManager.getSavedPomodoroMode(),
+            cycles = newCycleCount
         )
     }
 
-    // Mettre à jour les préférences de timer
-    fun updateTimerPreferences(workDuration: Long, breakDuration: Long) {
-        timerState.value = setTimerPreferencesUseCase.execute(workDuration, breakDuration)
-        savePomodoroPreferences(PomodoroMode(workDuration, breakDuration, "${workDuration / 1000 / 60}/${breakDuration / 1000 / 60}"))
+
+    fun savePomodoroPreferences(mode: PomodoroMode, cycles: Int) {
+        preferencesManager.savePomodoroMode(mode, cycles)
+        _cyclesBeforeLongBreak.value = cycles
     }
 
-    private fun savePomodoroPreferences(mode: PomodoroMode) {
-        preferencesManager.savePomodoroMode(mode)
+
+    fun updateTimerPreferences(workDuration: Long, breakDuration: Long, cycles: Int) {
+        val newTimerState = setTimerPreferencesUseCase.execute(workDuration, breakDuration)
+        _timerState.value = newTimerState.copy(remainingTime = newTimerState.workDuration)
+        cycles
+        savePomodoroPreferences(PomodoroMode(workDuration, breakDuration, "${workDuration / 1000 / 60}/${breakDuration / 1000 / 60}"), cycles)
     }
 
-    // Fonction pour démarrer le timer de travail
-    fun startTimer() {
+    //--- GESTION DU TIMER ---//
+
+    fun startTimer(context: Context) {
         if (timerState.value.isRunning) return
-        timerState.value = startTimerUseCase.execute(timerState.value.remainingTime)
+        _timerState.value = startTimerUseCase.execute(timerState.value.remainingTime)
         timerJob?.cancel()
-        startCountdown()
-    }
 
-    // Fonction pour démarrer une session de pause
-    fun startBreak() {
-        timerState.value = timerState.value.copy(
-            remainingTime = timerState.value.breakDuration,
-            isRunning = true,
-            isBreakTime = true
-        )
-        startCountdown()
-    }
-
-    // Démarre le décompte du timer (réutilisé pour le travail et la pause)
-    private fun startCountdown() {
         timerJob = viewModelScope.launch {
             val initialStartTime = System.currentTimeMillis()
             var lastUpdateTime = initialStartTime
@@ -96,52 +105,85 @@ class DoroPomoViewModel @Inject constructor(
                 val elapsedTime = currentTime - lastUpdateTime
                 if (elapsedTime >= oneSecond) {
                     val newRemainingTime = timerState.value.remainingTime - oneSecond
-                    timerState.value = timerState.value.copy(remainingTime = newRemainingTime)
+                    _timerState.value = timerState.value.copy(remainingTime = newRemainingTime)
                     lastUpdateTime += oneSecond
                 }
 
                 if (timerState.value.remainingTime <= 0L) {
-                    timerState.value = timerState.value.copy(remainingTime = 0L, isRunning = false)
                     timerJob?.cancel()
-                    onTimerComplete()
+                    onTimerFinish(context)
                 }
+
                 delay(updateInterval)
             }
         }
     }
 
-    // Fonction appelée lorsque le temps de travail ou de pause est écoulé
-    private fun onTimerComplete() {
-        playAlarmUseCase.execute()
-        if (timerState.value.isBreakTime) {
-            // Le break est terminé
-            stopAlarmUseCase.execute()
-        } else {
-            // Le travail est terminé, afficher le popup pour la pause
-            showBreakPopup()
-        }
-    }
-
-    // Fonction pour montrer le popup pour la pause
-    private fun showBreakPopup() {
-        // Logique pour déclencher un événement de popup, par ex. via un état observable
-    }
-
-    fun stopAlarm() {
-        stopAlarmUseCase.execute()
-    }
-
     fun pauseTimer() {
         timerJob?.cancel()
-        timerState.value = pauseTimerUseCase.execute()
+        _timerState.value = pauseTimerUseCase.execute()
     }
 
     fun resetTimer() {
         timerJob?.cancel()
-        timerState.value = resetTimerUseCase.execute()
+        _timerState.value = resetTimerUseCase.execute()
+        currentCycle = 0
     }
+
+    //--- GESTION DU THÈME ---//
 
     fun toggleTheme() {
         isDarkTheme.value = !isDarkTheme.value
+    }
+
+    //--- GESTION DU CYCLE ET DES PAUSES ---//
+
+    private fun onTimerFinish(context: Context) {
+        playAlarmUseCase.execute()
+        stopAlarmUseCase.execute()
+
+        if (!timerState.value.isBreakTime) {
+            // Fin de la période de travail
+            currentCycle++
+            if (currentCycle < cyclesBeforeLongBreak.value) {
+                showPopup.value = true
+                popupMessage.value = "Cycle de travail terminé ! Prêt pour une pause ?"
+            } else {
+                showPopup.value = true
+                popupMessage.value = "Cycles de travail complets ! Prêt pour une pause longue ?"
+                currentCycle = 0
+            }
+            _timerState.value = timerState.value.copy(isRunning = false)
+        } else {
+            // Fin de la pause
+            showPopup.value = true
+            popupMessage.value = "Pause terminée ! Prêt à reprendre le travail ?"
+            _timerState.value = timerState.value.copy(isRunning = false)
+        }
+    }
+
+    fun startWork(context: Context) {
+        showPopup.value = false
+        _timerState.value = timerState.value.copy(
+            remainingTime = timerState.value.workDuration,
+            isRunning = true,
+            isBreakTime = false
+        )
+        startTimer(context)
+    }
+
+    fun startBreak(context: Context) {
+        showPopup.value = false
+        val breakDuration = if (currentCycle == 0) timerState.value.breakDuration * 3 else timerState.value.breakDuration
+        _timerState.value = timerState.value.copy(
+            remainingTime = breakDuration,
+            isRunning = true,
+            isBreakTime = true
+        )
+        startTimer(context)
+    }
+
+    fun stopAlarm() {
+        stopAlarmUseCase.execute()
     }
 }
