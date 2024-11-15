@@ -42,6 +42,10 @@ fun TimerScreen(
     val context = LocalContext.current
     val isDarkTheme by viewModel.isDarkTheme
 
+    LaunchedEffect(cyclesBeforeLongBreak) {
+        println("verifycycles - TimerScreen: cyclesBeforeLongBreak updated to $cyclesBeforeLongBreak")
+    }
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background

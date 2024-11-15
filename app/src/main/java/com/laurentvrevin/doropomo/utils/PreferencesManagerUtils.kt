@@ -24,6 +24,8 @@ class PreferencesManager(context: Context) {
             .putLong(BREAK_DURATION_KEY, mode.breakDuration)
             .putInt(CYCLES_KEY, cycles)
             .apply()
+        // Log pour vérifier la sauvegarde dans SharedPreferences
+        println("verifycycles - PreferencesManager: cycles saved as $cycles")
     }
 
     // Récupérer le mode Pomodoro sauvegardé
@@ -36,7 +38,7 @@ class PreferencesManager(context: Context) {
     // Obtenir un Flow pour observer les changements
     fun getPomodoroModeFlow(): Flow<PomodoroMode> = callbackFlow {
         val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-            if (key == WORK_DURATION_KEY || key == BREAK_DURATION_KEY) {
+            if (key == WORK_DURATION_KEY || key == BREAK_DURATION_KEY ) {
                 trySend(getSavedPomodoroMode())
             }
         }
@@ -44,6 +46,9 @@ class PreferencesManager(context: Context) {
         awaitClose { sharedPreferences.unregisterOnSharedPreferenceChangeListener(listener) }
     }
     fun getSavedCycles(): Int {
-        return sharedPreferences.getInt(CYCLES_KEY, 4) // Valeur par défaut : 4 cycles
+        val savedCycles = sharedPreferences.getInt(CYCLES_KEY, 4) // Valeur par défaut : 4
+        // Log pour vérifier la récupération depuis SharedPreferences
+        println("verifycycles - PreferencesManager: cycles retrieved as $savedCycles")
+        return savedCycles
     }
 }

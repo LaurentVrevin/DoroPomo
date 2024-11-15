@@ -54,8 +54,6 @@ class DoroPomoViewModel @Inject constructor(
 
     private var currentCycle = 0 // Compteur de cycles de travail effectués
 
-
-
     init {
         // Écouter les changements de préférences sauvegardées
         viewModelScope.launch {
@@ -63,16 +61,24 @@ class DoroPomoViewModel @Inject constructor(
                 updateTimerPreferences(mode.workDuration, mode.breakDuration, cyclesBeforeLongBreak.value)
             }
         }
+
+        // Log pour vérifier l'initialisation
+        println("verifycycles - ViewModel: cyclesBeforeLongBreak initialized as ${_cyclesBeforeLongBreak.value}")
     }
 
     //--- GESTION DES PRÉFÉRENCES ---//
 
     fun updateCycleCount(newCycleCount: Int) {
+        // Mettre à jour la valeur dans le Flow
         _cyclesBeforeLongBreak.value = newCycleCount
+
+        // Sauvegarder dans les préférences
         preferencesManager.savePomodoroMode(
             mode = preferencesManager.getSavedPomodoroMode(),
             cycles = newCycleCount
         )
+        // Log pour vérifier la mise à jour dans ViewModel
+        println("verifycycles - ViewModel: cyclesBeforeLongBreak updated to $newCycleCount")
     }
 
 

@@ -61,11 +61,13 @@ fun SelectModeScreen(
                 onIncrement = {
                     val updatedCycle = numberOfCycles + 1
                     viewModel.updateCycleCount(updatedCycle)
+                    println("verifycycles - SelectModeScreen: cycles incremented to ${numberOfCycles + 1}")
                 },
                 onDecrement = {
                     if (numberOfCycles > 1) {
                         val updatedCycle = numberOfCycles - 1
                         viewModel.updateCycleCount(updatedCycle)
+                        println("verifycycles - SelectModeScreen: cycles decremented to ${numberOfCycles - 1}")
                     }
                 }
             )
@@ -80,6 +82,8 @@ fun SelectModeScreen(
                 val selectedPomodoroMode = predefinedModes.first { it.label == selectedMode }
 
                 viewModel.savePomodoroPreferences(selectedPomodoroMode, numberOfCycles)
+                // Rafraîchir l'état local pour forcer la synchronisation
+                //viewModel.updateCycleCount(numberOfCycles)
                 onSaveClick()
             }
         }
