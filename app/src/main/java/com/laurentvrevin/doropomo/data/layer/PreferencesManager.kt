@@ -1,11 +1,13 @@
-package com.laurentvrevin.doropomo.utils
+package com.laurentvrevin.doropomo.data.layer
 
 import android.content.Context
 import android.content.SharedPreferences
 import com.laurentvrevin.doropomo.domain.entity.PomodoroMode
+import com.laurentvrevin.doropomo.domain.entity.TimerState
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+
 
 class PreferencesManager(context: Context) {
     private val sharedPreferences: SharedPreferences =
@@ -17,38 +19,50 @@ class PreferencesManager(context: Context) {
         private const val CYCLES_KEY = "cycles_before_long_break"
     }
 
-    // Sauvegarder les durées de travail et de pause
     fun savePomodoroMode(mode: PomodoroMode, cycles: Int) {
         sharedPreferences.edit()
             .putLong(WORK_DURATION_KEY, mode.workDuration)
             .putLong(BREAK_DURATION_KEY, mode.breakDuration)
             .putInt(CYCLES_KEY, cycles)
             .apply()
-        // Log pour vérifier la sauvegarde dans SharedPreferences
-        println("verifycycles - PreferencesManager: cycles saved as $cycles")
+        println("verifycycles - PreferencesManager: savePomodoroMode")
     }
 
-    // Récupérer le mode Pomodoro sauvegardé
+    fun getSavedTimerState(): TimerState {
+        println("verifycycles - PreferencesManager: getSavedTimerState")
+        val workDuration = sharedPreferences.getLong(WORK_DURATION_KEY, 25 * 60 * 1000L)
+        val breakDuration = sharedPreferences.getLong(BREAK_DURATION_KEY, 5 * 60 * 1000L)
+        val cycles = sharedPreferences.getInt(CYCLES_KEY, 4)
+        return TimerState(
+            workDuration = workDuration,
+            breakDuration = breakDuration,
+            remainingTime = workDuration,
+            cyclesBeforeLongBreak = cycles
+        )
+        println("verifycycles - PreferencesManager: getSavedTimerState $workDuration & $breakDuration & $cycles")
+    }
+
     fun getSavedPomodoroMode(): PomodoroMode {
         val workDuration = sharedPreferences.getLong(WORK_DURATION_KEY, 25 * 60 * 1000L)
         val breakDuration = sharedPreferences.getLong(BREAK_DURATION_KEY, 5 * 60 * 1000L)
         return PomodoroMode(workDuration, breakDuration, "${workDuration / 1000 / 60}/${breakDuration / 1000 / 60}")
+        println("verifycycles - getSavedPomodoroMode: getPomodoroModeFlow")
     }
 
-    // Obtenir un Flow pour observer les changements
     fun getPomodoroModeFlow(): Flow<PomodoroMode> = callbackFlow {
         val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-            if (key == WORK_DURATION_KEY || key == BREAK_DURATION_KEY ) {
+            if (key in listOf(WORK_DURATION_KEY, BREAK_DURATION_KEY, CYCLES_KEY)) {
                 trySend(getSavedPomodoroMode())
             }
         }
+        println("verifycycles - PreferencesManager: getPomodoroModeFlow")
         sharedPreferences.registerOnSharedPreferenceChangeListener(listener)
         awaitClose { sharedPreferences.unregisterOnSharedPreferenceChangeListener(listener) }
     }
+
     fun getSavedCycles(): Int {
-        val savedCycles = sharedPreferences.getInt(CYCLES_KEY, 4) // Valeur par défaut : 4
-        // Log pour vérifier la récupération depuis SharedPreferences
-        println("verifycycles - PreferencesManager: cycles retrieved as $savedCycles")
+        val savedCycles = sharedPreferences.getInt(CYCLES_KEY, 4)
+        println("verifycycles - PreferencesManager: getSavedCycles | cycles retrieved as $savedCycles")
         return savedCycles
     }
 }

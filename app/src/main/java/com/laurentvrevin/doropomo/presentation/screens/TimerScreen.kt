@@ -16,7 +16,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.laurentvrevin.doropomo.domain.entity.TimerState
 import com.laurentvrevin.doropomo.presentation.components.CircleProgressIndicator
 import com.laurentvrevin.doropomo.presentation.components.CustomTextButton
 import com.laurentvrevin.doropomo.presentation.components.SettingsButton
@@ -28,9 +27,10 @@ import com.laurentvrevin.doropomo.ui.theme.Dimens
 
 @Composable
 fun TimerScreen(
-    viewModel: DoroPomoViewModel = hiltViewModel(),
+    viewModel: DoroPomoViewModel,
     onSelectModeClick: () -> Unit,
 ) {
+    println("verifycycles - TimerScreen :ViewModel id = ${viewModel.id}")
     // Observez le timerState et l'indicateur modeUpdated
     val timerState by viewModel.timerState.collectAsState()
 
@@ -43,7 +43,7 @@ fun TimerScreen(
     val isDarkTheme by viewModel.isDarkTheme
 
     LaunchedEffect(cyclesBeforeLongBreak) {
-        println("verifycycles - TimerScreen: cyclesBeforeLongBreak updated to $cyclesBeforeLongBreak")
+        println("verifycycles - TimerScreen: LaunchEffect ")
     }
 
     Surface(

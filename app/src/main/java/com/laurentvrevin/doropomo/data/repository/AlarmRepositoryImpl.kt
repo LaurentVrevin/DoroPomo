@@ -1,6 +1,5 @@
 package com.laurentvrevin.doropomo.data.repository
 
-import android.app.AlarmManager
 import android.content.Context
 import android.media.Ringtone
 import android.media.RingtoneManager

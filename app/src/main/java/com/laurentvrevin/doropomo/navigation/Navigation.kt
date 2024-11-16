@@ -18,25 +18,28 @@ sealed class Screen(val route: String) {
 @Composable
 fun Navigation(
     navController: NavHostController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: DoroPomoViewModel // Passer le ViewModel en paramètre
 ) {
-    val viewModel: DoroPomoViewModel = hiltViewModel()
-
     NavHost(
         navController = navController,
         startDestination = Screen.TimerScreen.route,
         modifier = modifier
     ) {
+        println("verifycycles - Navigation: Navigating to ${Screen.TimerScreen.route}")
+
         composable(Screen.TimerScreen.route) {
             TimerScreen(
-                viewModel = viewModel,
+                viewModel = viewModel, // Utiliser l'instance passée
                 onSelectModeClick = { navController.navigate(Screen.SelectModeScreen.route) }
             )
         }
+
         composable(Screen.SelectModeScreen.route) {
             SelectModeScreen(
                 onBackClick = { navController.popBackStack() },
-                onSaveClick = { navController.navigate(Screen.TimerScreen.route) }
+                onSaveClick = { navController.navigate(Screen.TimerScreen.route) },
+                viewModel = viewModel // Utiliser l'instance passée
             )
         }
     }

@@ -6,5 +6,6 @@ import com.laurentvrevin.doropomo.domain.repository.TimerRepository
 class ResetTimerUseCase(private val timerRepository: TimerRepository) {
     fun execute(): TimerState {
         return timerRepository.resetTimer()
+        println("verifycycles - ResetTimerUseCase")
     }
 }

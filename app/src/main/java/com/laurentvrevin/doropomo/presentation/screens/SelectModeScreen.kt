@@ -27,13 +27,14 @@ import com.laurentvrevin.doropomo.ui.theme.Dimens
 fun SelectModeScreen(
     onBackClick: () -> Unit,
     onSaveClick: () -> Unit,
-    viewModel: DoroPomoViewModel = hiltViewModel()
+    viewModel: DoroPomoViewModel
 ) {
     val savedMode = viewModel.timerState.value.run { PomodoroMode(workDuration, breakDuration, "${workDuration / 1000 / 60}/${breakDuration / 1000 / 60}") }
     var selectedMode by remember { mutableStateOf(savedMode.label) }
+    println("verifycycles - SelectModeScreen : ViewModel id = ${viewModel.id}")
 
     // Observez cyclesBeforeLongBreak via ViewModel
-    val numberOfCycles by viewModel.cyclesBeforeLongBreak.collectAsState()
+    val numberOfCycles = viewModel.timerState.collectAsState().value.cyclesBeforeLongBreak
 
     var longBreakDuration by remember { mutableIntStateOf(15) }
     var dontDisturbMode by remember { mutableStateOf(false) }

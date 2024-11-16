@@ -6,7 +6,7 @@ import com.laurentvrevin.doropomo.data.repository.TimerRepositoryImpl
 import com.laurentvrevin.doropomo.domain.repository.AlarmRepository
 import com.laurentvrevin.doropomo.domain.repository.TimerRepository
 import com.laurentvrevin.doropomo.domain.usecase.*
-import com.laurentvrevin.doropomo.utils.PreferencesManager
+import com.laurentvrevin.doropomo.data.layer.PreferencesManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

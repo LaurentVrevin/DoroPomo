@@ -28,7 +28,7 @@ class TimerRepositoryImpl : TimerRepository {
 
     override fun resetTimer(): TimerState {
         timerState = timerState.copy(
-            remainingTime = timerState.workDuration,
+            remainingTime = timerState.workDuration, // Réinitialise le temps restant à la durée de travail
             isRunning = false,
             isBreakTime = false
         )
@@ -43,7 +43,7 @@ class TimerRepositoryImpl : TimerRepository {
         timerState = timerState.copy(
             workDuration = workDuration,
             breakDuration = breakDuration,
-            remainingTime = workDuration,
+            remainingTime = if (timerState.isRunning) timerState.remainingTime else workDuration,
             isRunning = false
         )
         return timerState

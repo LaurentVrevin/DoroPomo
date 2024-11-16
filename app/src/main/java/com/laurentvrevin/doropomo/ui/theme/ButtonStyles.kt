@@ -1,5 +1,6 @@
 package com.laurentvrevin.doropomo.ui.theme
 
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwitchDefaults
@@ -7,8 +8,16 @@ import androidx.compose.runtime.Composable
 
 object ButtonStyles {
     // Define button styles here
+
+    //Button Transparent with border
     @Composable
     fun primaryIconButtonColors() = IconButtonDefaults.filledIconButtonColors(
+        containerColor = MaterialTheme.colorScheme.primary,
+        contentColor = MaterialTheme.colorScheme.onPrimary
+    )
+    //Normal Button
+    @Composable
+    fun primaryButtonColors() = ButtonDefaults.filledTonalButtonColors(
         containerColor = MaterialTheme.colorScheme.primary,
         contentColor = MaterialTheme.colorScheme.onPrimary
     )

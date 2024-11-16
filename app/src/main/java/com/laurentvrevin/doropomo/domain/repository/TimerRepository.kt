@@ -8,4 +8,5 @@ interface TimerRepository {
     fun resetTimer(): TimerState
     fun getTimerState(): TimerState
     fun setTimerPreferences(workDuration: Long, breakDuration: Long): TimerState // Nouvelle méthode
+
 }
