@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 
 
-class PreferencesManager(context: Context) {
+class PreferenceManager(context: Context) {
     private val sharedPreferences: SharedPreferences =
         context.getSharedPreferences("DoroPomoPreferences", Context.MODE_PRIVATE)
 
@@ -25,11 +25,9 @@ class PreferencesManager(context: Context) {
             .putLong(BREAK_DURATION_KEY, mode.breakDuration)
             .putInt(CYCLES_KEY, cycles)
             .apply()
-        println("verifycycles - PreferencesManager: savePomodoroMode")
     }
 
     fun getSavedTimerState(): TimerState {
-        println("verifycycles - PreferencesManager: getSavedTimerState")
         val workDuration = sharedPreferences.getLong(WORK_DURATION_KEY, 25 * 60 * 1000L)
         val breakDuration = sharedPreferences.getLong(BREAK_DURATION_KEY, 5 * 60 * 1000L)
         val cycles = sharedPreferences.getInt(CYCLES_KEY, 4)
@@ -39,14 +37,12 @@ class PreferencesManager(context: Context) {
             remainingTime = workDuration,
             cyclesBeforeLongBreak = cycles
         )
-        println("verifycycles - PreferencesManager: getSavedTimerState $workDuration & $breakDuration & $cycles")
     }
 
     fun getSavedPomodoroMode(): PomodoroMode {
         val workDuration = sharedPreferences.getLong(WORK_DURATION_KEY, 25 * 60 * 1000L)
         val breakDuration = sharedPreferences.getLong(BREAK_DURATION_KEY, 5 * 60 * 1000L)
         return PomodoroMode(workDuration, breakDuration, "${workDuration / 1000 / 60}/${breakDuration / 1000 / 60}")
-        println("verifycycles - getSavedPomodoroMode: getPomodoroModeFlow")
     }
 
     fun getPomodoroModeFlow(): Flow<PomodoroMode> = callbackFlow {
@@ -55,14 +51,12 @@ class PreferencesManager(context: Context) {
                 trySend(getSavedPomodoroMode())
             }
         }
-        println("verifycycles - PreferencesManager: getPomodoroModeFlow")
         sharedPreferences.registerOnSharedPreferenceChangeListener(listener)
         awaitClose { sharedPreferences.unregisterOnSharedPreferenceChangeListener(listener) }
     }
 
     fun getSavedCycles(): Int {
         val savedCycles = sharedPreferences.getInt(CYCLES_KEY, 4)
-        println("verifycycles - PreferencesManager: getSavedCycles | cycles retrieved as $savedCycles")
         return savedCycles
     }
 }
