@@ -1,4 +1,4 @@
-package com.laurentvrevin.doropomo.data.layer
+package com.laurentvrevin.doropomo.domain.manager
 
 import android.content.Context
 import android.content.SharedPreferences
