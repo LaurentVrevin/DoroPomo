@@ -1,4 +1,4 @@
-package com.laurentvrevin.doropomo.domain.manager
+package com.laurentvrevin.doropomo.data.manager
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -17,6 +17,7 @@ class PreferenceManager(context: Context) {
         private const val WORK_DURATION_KEY = "work_duration"
         private const val BREAK_DURATION_KEY = "break_duration"
         private const val CYCLES_KEY = "cycles_before_long_break"
+        private const val DO_NOT_DISTURB_KEY = "do_not_disturb"
     }
 
     fun savePomodoroMode(mode: PomodoroMode, cycles: Int) {
@@ -39,7 +40,7 @@ class PreferenceManager(context: Context) {
         )
     }
 
-    fun getSavedPomodoroMode(): PomodoroMode {
+    private fun getSavedPomodoroMode(): PomodoroMode {
         val workDuration = sharedPreferences.getLong(WORK_DURATION_KEY, 25 * 60 * 1000L)
         val breakDuration = sharedPreferences.getLong(BREAK_DURATION_KEY, 5 * 60 * 1000L)
         return PomodoroMode(workDuration, breakDuration, "${workDuration / 1000 / 60}/${breakDuration / 1000 / 60}")
@@ -55,8 +56,14 @@ class PreferenceManager(context: Context) {
         awaitClose { sharedPreferences.unregisterOnSharedPreferenceChangeListener(listener) }
     }
 
-    fun getSavedCycles(): Int {
-        val savedCycles = sharedPreferences.getInt(CYCLES_KEY, 4)
-        return savedCycles
+    fun saveDoNotDisturbPreference(isEnabled: Boolean) {
+        sharedPreferences.edit()
+            .putBoolean("DO_NOT_DISTURB_KEY", isEnabled)
+            .apply()
     }
+
+    fun isDoNotDisturbEnabled(): Boolean {
+        return sharedPreferences.getBoolean(DO_NOT_DISTURB_KEY, false)
+    }
+
 }

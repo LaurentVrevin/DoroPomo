@@ -1,7 +1,7 @@
-package com.laurentvrevin.doropomo.domain.usecase
+package com.laurentvrevin.doropomo.domain.usecase.timer
 
 import com.laurentvrevin.doropomo.domain.entity.TimerState
-import com.laurentvrevin.doropomo.domain.manager.PreferenceManager
+import com.laurentvrevin.doropomo.data.manager.PreferenceManager
 import com.laurentvrevin.doropomo.domain.repository.TimerRepository
 
 class ResetTimerUseCase(

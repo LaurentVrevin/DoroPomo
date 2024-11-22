@@ -1,15 +1,15 @@
-package com.laurentvrevin.doropomo.domain.usecase
+package com.laurentvrevin.doropomo.domain.usecase.preferences
 
 import com.laurentvrevin.doropomo.domain.entity.PomodoroMode
 import com.laurentvrevin.doropomo.domain.entity.TimerState
-import com.laurentvrevin.doropomo.domain.manager.PreferenceManager
+import com.laurentvrevin.doropomo.domain.repository.PreferenceRepository
 
 class UpdateCycleCountUseCase (
-    private val preferenceManager: PreferenceManager
+    private val preferenceRepository: PreferenceRepository
     ) {
         fun execute(currentState: TimerState, newCycleCount: Int): TimerState {
             // Sauvegarder les cycles dans les préférences
-            preferenceManager.savePomodoroMode(
+            preferenceRepository.savePomodoroPreferences(
                 PomodoroMode(
                     currentState.workDuration,
                     currentState.breakDuration,

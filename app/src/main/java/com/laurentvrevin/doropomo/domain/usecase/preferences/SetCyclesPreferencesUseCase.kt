@@ -1,4 +1,7 @@
 package com.laurentvrevin.doropomo.domain.usecase.preferences
 
-class setCyclesPreferencesUseCase {
+import com.laurentvrevin.doropomo.domain.repository.PreferenceRepository
+
+class SetCyclesPreferencesUseCase(preferenceRepository: PreferenceRepository) {
+
 }

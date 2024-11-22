@@ -5,11 +5,10 @@ import android.media.Ringtone
 import android.media.RingtoneManager
 import android.net.Uri
 import com.laurentvrevin.doropomo.domain.repository.AlarmRepository
-import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 class AlarmRepositoryImpl @Inject constructor(
-    @ApplicationContext private val context: Context
+    private val context: Context
 ) : AlarmRepository {
 
     private var ringtone: Ringtone? = null

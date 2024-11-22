@@ -1,7 +1,8 @@
-package com.laurentvrevin.doropomo.domain.usecase
+package com.laurentvrevin.doropomo.domain.usecase.timer
 
 import com.laurentvrevin.doropomo.domain.entity.TimerState
 import com.laurentvrevin.doropomo.domain.repository.TimerRepository
+import com.laurentvrevin.doropomo.domain.usecase.alarm.PlayAlarmUseCase
 import kotlinx.coroutines.delay
 
 class StartTimerUseCase(

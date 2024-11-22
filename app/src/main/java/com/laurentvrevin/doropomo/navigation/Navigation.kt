@@ -2,13 +2,13 @@ package com.laurentvrevin.doropomo.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.laurentvrevin.doropomo.presentation.screens.SelectModeScreen
 import com.laurentvrevin.doropomo.presentation.screens.TimerScreen
 import com.laurentvrevin.doropomo.presentation.viewmodel.DoroPomoViewModel
+
 
 sealed class Screen(val route: String) {
     data object TimerScreen : Screen("timer_screen")

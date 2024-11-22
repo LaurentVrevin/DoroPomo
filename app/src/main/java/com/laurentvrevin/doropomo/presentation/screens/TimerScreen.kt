@@ -1,6 +1,6 @@
 package com.laurentvrevin.doropomo.presentation.screens
 
-import android.util.Log
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.laurentvrevin.doropomo.presentation.components.CircleProgressIndicator
 import com.laurentvrevin.doropomo.presentation.components.CustomTextButton
 import com.laurentvrevin.doropomo.presentation.components.SettingsButton
@@ -30,13 +29,13 @@ fun TimerScreen(
     viewModel: DoroPomoViewModel,
     onSelectModeClick: () -> Unit,
 ) {
-    println("verifycycles - TimerScreen :ViewModel id = ${viewModel.id}")
+
     // Observez le timerState et l'indicateur modeUpdated
     val timerState by viewModel.timerState.collectAsState()
 
     val workDuration = timerState.workDuration
     val remainingTime = timerState.remainingTime
-    val cyclesBeforeLongBreak by viewModel.cyclesBeforeLongBreak.collectAsState()
+    val cyclesBeforeLongBreak = timerState.cyclesBeforeLongBreak
     val isRunning = timerState.isRunning
 
     val context = LocalContext.current
@@ -70,7 +69,7 @@ fun TimerScreen(
                     if (isRunning) {
                         viewModel.pauseTimer()
                     } else {
-                        viewModel.startTimer(context)
+                        viewModel.startTimer()
                     }
                 },
                 isRunning = isRunning
@@ -166,7 +165,7 @@ fun formatTime(timeInMillis: Long): String {
 fun TimerFooter(
     onStopClick: () -> Unit,
 
-) {
+    ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

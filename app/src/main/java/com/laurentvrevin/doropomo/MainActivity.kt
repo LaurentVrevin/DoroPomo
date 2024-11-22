@@ -1,5 +1,6 @@
 package com.laurentvrevin.doropomo
 
+
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -18,14 +19,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        println("verifycycles - MainActivity")
+
 
         setContent {
             val viewModel: DoroPomoViewModel = hiltViewModel()
             val isDarkTheme by viewModel.isDarkTheme
-            println("verifycycles - MainActivity: ViewModel id = ${viewModel.id}")
-
-            println("verifycycles - MainActivity after viewmodel")
 
             DoropomoTheme(darkTheme = isDarkTheme) {
                 val navController: NavHostController = rememberNavController()
