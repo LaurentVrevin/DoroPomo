@@ -2,23 +2,21 @@ package com.laurentvrevin.doropomo.di
 
 import android.content.Context
 import com.laurentvrevin.doropomo.data.manager.DoNotDisturbManager
+import com.laurentvrevin.doropomo.data.manager.UserPreferencesStorage
 import com.laurentvrevin.doropomo.data.repository.AlarmRepositoryImpl
-import com.laurentvrevin.doropomo.data.repository.PreferenceRepositoryImpl
-import com.laurentvrevin.doropomo.data.repository.TimerRepositoryImpl
+import com.laurentvrevin.doropomo.data.repository.DoNotDisturbRepositoryImpl
+import com.laurentvrevin.doropomo.data.repository.TimerStateRepositoryImpl
+import com.laurentvrevin.doropomo.data.repository.UserPreferencesRepositoryImpl
 import com.laurentvrevin.doropomo.domain.repository.AlarmRepository
-import com.laurentvrevin.doropomo.domain.repository.TimerRepository
-import com.laurentvrevin.doropomo.data.manager.PreferenceManager
-import com.laurentvrevin.doropomo.domain.repository.PreferenceRepository
-import com.laurentvrevin.doropomo.domain.usecase.timer.FinishTimerUseCase
-import com.laurentvrevin.doropomo.domain.usecase.timer.PauseTimerUseCase
+import com.laurentvrevin.doropomo.domain.repository.DoNotDisturbRepository
+import com.laurentvrevin.doropomo.domain.repository.TimerStateRepository
+import com.laurentvrevin.doropomo.domain.repository.UserPreferencesRepository
 import com.laurentvrevin.doropomo.domain.usecase.alarm.PlayAlarmUseCase
 import com.laurentvrevin.doropomo.domain.usecase.alarm.StopAlarmUseCase
-import com.laurentvrevin.doropomo.domain.usecase.preferences.SavePomodoroPreferencesUseCase
-import com.laurentvrevin.doropomo.domain.usecase.preferences.SetTimerPreferencesUseCase
+import com.laurentvrevin.doropomo.domain.usecase.preferences.GetUserPreferencesUseCase
+import com.laurentvrevin.doropomo.domain.usecase.preferences.SaveUserPreferencesUseCase
 import com.laurentvrevin.doropomo.domain.usecase.preferences.UpdateCycleCountUseCase
-import com.laurentvrevin.doropomo.domain.usecase.timer.ResetTimerUseCase
-import com.laurentvrevin.doropomo.domain.usecase.timer.StartTimerUseCase
-import com.laurentvrevin.doropomo.domain.usecase.timer.UpdateTimerStateUseCase
+import com.laurentvrevin.doropomo.domain.usecase.timer.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,83 +28,124 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
-    @Singleton
-    @Provides
-    fun provideTimerRepository(): TimerRepository {
-        return TimerRepositoryImpl()
-    }
-
-    @Singleton
-    @Provides
-    fun provideStartTimerUseCase(timerRepository: TimerRepository, updateTimerStateUseCase: UpdateTimerStateUseCase, playAlarmUseCase: PlayAlarmUseCase): StartTimerUseCase {
-        return StartTimerUseCase(timerRepository, updateTimerStateUseCase, playAlarmUseCase)
-    }
-    @Singleton
-    @Provides
-    fun provideUpdateTimerStateUseCase(timerRepository: TimerRepository): UpdateTimerStateUseCase {
-        return UpdateTimerStateUseCase(timerRepository)
-    }
-
-    @Singleton
-    @Provides
-    fun providePauseTimerUseCase(timerRepository: TimerRepository): PauseTimerUseCase {
-        return PauseTimerUseCase(timerRepository)
-    }
-
-    @Singleton
-    @Provides
-    fun provideResetTimerUseCase(timerRepository: TimerRepository, preferenceManager: PreferenceManager): ResetTimerUseCase {
-        return ResetTimerUseCase(timerRepository, preferenceManager)
-    }
-
-    @Singleton
-    @Provides
-    fun provideUpdateCycleCountUseCase(preferenceRepository: PreferenceRepository): UpdateCycleCountUseCase {
-        return UpdateCycleCountUseCase(preferenceRepository)
-    }
-
-    @Singleton
-    @Provides
-    fun provideFinishTimerUseCase(playAlarmUseCase: PlayAlarmUseCase, stopAlarmUseCase: StopAlarmUseCase, timerRepository: TimerRepository): FinishTimerUseCase {
-        return FinishTimerUseCase(playAlarmUseCase, stopAlarmUseCase, timerRepository)
-    }
-
-    @Singleton
-    @Provides
-    fun providePreferenceRepository(preferenceManager: PreferenceManager, doNotDisturbManager: DoNotDisturbManager): PreferenceRepository {
-        return PreferenceRepositoryImpl(preferenceManager, doNotDisturbManager)
-    }
-
-    @Singleton
-    @Provides
-    fun provideSetTimerPreferencesUseCase(timerRepository: TimerRepository): SetTimerPreferencesUseCase {
-        return SetTimerPreferencesUseCase(timerRepository)
-    }
-
-    @Singleton
-    @Provides
-    fun provideSavePreferenceUseCase(preferenceManager: PreferenceManager, timerRepository: TimerRepository): SavePomodoroPreferencesUseCase {
-        return SavePomodoroPreferencesUseCase(preferenceManager, timerRepository)
-    }
-
-    @Singleton
-    @Provides
-    fun providePreferencesManager(@ApplicationContext context: Context): PreferenceManager {
-        return PreferenceManager(context)
-    }
-
+    // --- Managers ---
     @Singleton
     @Provides
     fun provideDoNotDisturbManager(@ApplicationContext context: Context): DoNotDisturbManager {
         return DoNotDisturbManager(context)
     }
 
-    @Provides
     @Singleton
+    @Provides
+    fun provideUserPreferencesStorage(@ApplicationContext context: Context): UserPreferencesStorage {
+        return UserPreferencesStorage(context)
+    }
+
+    // --- Repositories ---
+    @Singleton
+    @Provides
+    fun provideTimerStateRepository(): TimerStateRepository {
+        return TimerStateRepositoryImpl()
+    }
+
+    @Singleton
+    @Provides
+    fun provideUserPreferencesRepository(
+        userPreferencesStorage: UserPreferencesStorage
+    ): UserPreferencesRepository {
+        return UserPreferencesRepositoryImpl(userPreferencesStorage)
+    }
+
+    @Singleton
+    @Provides
+    fun provideDoNotDisturbRepository(
+        doNotDisturbManager: DoNotDisturbManager
+    ): DoNotDisturbRepository {
+        return DoNotDisturbRepositoryImpl(doNotDisturbManager)
+    }
+
+    @Singleton
+    @Provides
     fun provideAlarmRepository(@ApplicationContext context: Context): AlarmRepository {
         return AlarmRepositoryImpl(context)
     }
 
+    // --- Timer UseCases ---
+    @Singleton
+    @Provides
+    fun provideStartTimerUseCase(
+        timerStateRepository: TimerStateRepository,
+        updateTimerStateUseCase: UpdateTimerStateUseCase,
+        playAlarmUseCase: PlayAlarmUseCase
+    ): StartTimerUseCase {
+        return StartTimerUseCase(timerStateRepository, updateTimerStateUseCase, playAlarmUseCase)
+    }
+
+    @Singleton
+    @Provides
+    fun providePauseTimerUseCase(timerStateRepository: TimerStateRepository): PauseTimerUseCase {
+        return PauseTimerUseCase(timerStateRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideResetTimerUseCase(
+        userPreferencesRepository: UserPreferencesRepository
+    ): ResetTimerUseCase {
+        return ResetTimerUseCase(userPreferencesRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideFinishTimerUseCase(
+        playAlarmUseCase: PlayAlarmUseCase,
+        stopAlarmUseCase: StopAlarmUseCase,
+        timerStateRepository: TimerStateRepository
+    ): FinishTimerUseCase {
+        return FinishTimerUseCase(playAlarmUseCase, stopAlarmUseCase, timerStateRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideUpdateTimerStateUseCase(
+        timerStateRepository: TimerStateRepository
+    ): UpdateTimerStateUseCase {
+        return UpdateTimerStateUseCase(timerStateRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideSetTimerStateUseCase(
+        timerStateRepository: TimerStateRepository
+    ): SetTimerStateUseCase {
+        return SetTimerStateUseCase(timerStateRepository)
+    }
+
+    // --- Preferences UseCases ---
+    @Singleton
+    @Provides
+    fun provideSetTimerPreferencesUseCase(
+        userPreferencesRepository: UserPreferencesRepository
+    ): GetUserPreferencesUseCase {
+        return GetUserPreferencesUseCase(userPreferencesRepository)
+    }
+
+    @Provides
+    fun provideSaveUserPreferencesUseCase(
+        repository: UserPreferencesRepository
+    ): SaveUserPreferencesUseCase {
+        return SaveUserPreferencesUseCase(repository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideUpdateCycleCountUseCase(
+        userPreferencesRepository: UserPreferencesRepository
+    ): UpdateCycleCountUseCase {
+        return UpdateCycleCountUseCase(userPreferencesRepository)
+    }
+
+    // --- Alarm UseCases ---
     @Singleton
     @Provides
     fun providePlayAlarmUseCase(alarmRepository: AlarmRepository): PlayAlarmUseCase {

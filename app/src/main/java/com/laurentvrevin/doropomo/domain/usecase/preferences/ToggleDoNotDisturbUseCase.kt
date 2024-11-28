@@ -1,11 +1,11 @@
 package com.laurentvrevin.doropomo.domain.usecase.preferences
 
-import com.laurentvrevin.doropomo.domain.repository.PreferenceRepository
+import com.laurentvrevin.doropomo.domain.repository.DoNotDisturbRepository
 
 class ToggleDoNotDisturbUseCase(
-    private val preferencesRepository: PreferenceRepository
+    private val doNotDisturbRepository: DoNotDisturbRepository
 ) {
     fun execute(isEnabled: Boolean) {
-        preferencesRepository.saveDoNotDisturbPreference(isEnabled)
+        doNotDisturbRepository.setDoNotDisturb(isEnabled)
     }
 }

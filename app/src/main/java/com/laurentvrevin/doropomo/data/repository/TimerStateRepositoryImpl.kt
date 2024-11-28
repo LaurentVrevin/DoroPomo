@@ -1,10 +1,10 @@
     package com.laurentvrevin.doropomo.data.repository
 
     import com.laurentvrevin.doropomo.domain.entity.TimerState
-    import com.laurentvrevin.doropomo.domain.repository.TimerRepository
+    import com.laurentvrevin.doropomo.domain.repository.TimerStateRepository
     import javax.inject.Inject
 
-    class TimerRepositoryImpl @Inject constructor() : TimerRepository {
+    class TimerStateRepositoryImpl @Inject constructor() : TimerStateRepository {
         private var timerState = TimerState()
 
         override fun startTimer(duration: Long): TimerState {

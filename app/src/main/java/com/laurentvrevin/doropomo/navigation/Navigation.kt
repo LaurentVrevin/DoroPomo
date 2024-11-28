@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import com.laurentvrevin.doropomo.presentation.screens.SelectModeScreen
 import com.laurentvrevin.doropomo.presentation.screens.TimerScreen
 import com.laurentvrevin.doropomo.presentation.viewmodel.DoroPomoViewModel
+import com.laurentvrevin.doropomo.presentation.viewmodel.UserPreferencesViewModel
 
 
 sealed class Screen(val route: String) {
@@ -19,7 +20,8 @@ sealed class Screen(val route: String) {
 fun Navigation(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    viewModel: DoroPomoViewModel // Passer le ViewModel en paramètre
+    doroPomoViewModel: DoroPomoViewModel,
+    userPreferencesViewModel: UserPreferencesViewModel
 ) {
     NavHost(
         navController = navController,
@@ -30,7 +32,8 @@ fun Navigation(
 
         composable(Screen.TimerScreen.route) {
             TimerScreen(
-                viewModel = viewModel, // Utiliser l'instance passée
+                doroPomoViewModel = doroPomoViewModel,
+                userPreferencesViewModel = userPreferencesViewModel,
                 onSelectModeClick = { navController.navigate(Screen.SelectModeScreen.route) }
             )
         }
@@ -39,7 +42,8 @@ fun Navigation(
             SelectModeScreen(
                 onBackClick = { navController.popBackStack() },
                 onSaveClick = { navController.navigate(Screen.TimerScreen.route) },
-                viewModel = viewModel // Utiliser l'instance passée
+                doroPomoViewModel = doroPomoViewModel,
+                userPreferencesViewModel = userPreferencesViewModel
             )
         }
     }

@@ -1,10 +1,10 @@
 package com.laurentvrevin.doropomo.domain.usecase.timer
 
 import com.laurentvrevin.doropomo.domain.entity.TimerState
-import com.laurentvrevin.doropomo.domain.repository.TimerRepository
+import com.laurentvrevin.doropomo.domain.repository.TimerStateRepository
 
 class UpdateTimerStateUseCase(
-    private val timerRepository: TimerRepository
+    private val timerStateRepository: TimerStateRepository
 ) {
     fun execute(currentState: TimerState, elapsedTime: Long): TimerState {
         val newRemainingTime = currentState.remainingTime - elapsedTime
@@ -12,7 +12,7 @@ class UpdateTimerStateUseCase(
             remainingTime = newRemainingTime.coerceAtLeast(0),
             isRunning = newRemainingTime > 0
         )
-        timerRepository.updateTimerState(updatedState)
+        timerStateRepository.updateTimerState(updatedState)
         return updatedState
     }
 }

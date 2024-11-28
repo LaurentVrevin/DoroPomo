@@ -1,12 +1,12 @@
 package com.laurentvrevin.doropomo.domain.usecase.timer
 
 import com.laurentvrevin.doropomo.domain.entity.TimerState
-import com.laurentvrevin.doropomo.domain.repository.TimerRepository
+import com.laurentvrevin.doropomo.domain.repository.TimerStateRepository
 import com.laurentvrevin.doropomo.domain.usecase.alarm.PlayAlarmUseCase
 import kotlinx.coroutines.delay
 
 class StartTimerUseCase(
-    private val timerRepository: TimerRepository,
+    private val timerStateRepository: TimerStateRepository,
     private val updateTimerStateUseCase: UpdateTimerStateUseCase,
     private val playAlarmUseCase: PlayAlarmUseCase
 ) {
@@ -15,7 +15,7 @@ class StartTimerUseCase(
         onTick: (TimerState) -> Unit,
         onFinish: () -> Unit
     ) {
-        var currentState = timerRepository.startTimer(timerState.remainingTime)
+        var currentState = timerStateRepository.startTimer(timerState.remainingTime)
         onTick(currentState)
 
         val startTime = System.currentTimeMillis()

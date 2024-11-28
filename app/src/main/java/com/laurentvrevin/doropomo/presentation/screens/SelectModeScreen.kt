@@ -1,7 +1,5 @@
     package com.laurentvrevin.doropomo.presentation.screens
 
-
-    import android.annotation.SuppressLint
     import android.util.Log
     import androidx.compose.foundation.layout.*
     import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,30 +13,36 @@
     import androidx.compose.ui.text.font.FontWeight
     import androidx.compose.ui.unit.dp
     import androidx.compose.ui.unit.sp
+    import com.laurentvrevin.doropomo.domain.entity.PomodoroMode
     import com.laurentvrevin.doropomo.domain.entity.predefinedModes
     import com.laurentvrevin.doropomo.presentation.components.CycleSelector
     import com.laurentvrevin.doropomo.presentation.components.SelectableButton
     import com.laurentvrevin.doropomo.presentation.viewmodel.DoroPomoViewModel
+    import com.laurentvrevin.doropomo.presentation.viewmodel.UserPreferencesViewModel
     import com.laurentvrevin.doropomo.ui.theme.Dimens
 
-    @SuppressLint("StateFlowValueCalledInComposition")
     @Composable
     fun SelectModeScreen(
         onBackClick: () -> Unit,
         onSaveClick: () -> Unit,
-        viewModel: DoroPomoViewModel
+        doroPomoViewModel: DoroPomoViewModel,
+        userPreferencesViewModel: UserPreferencesViewModel
     ) {
-        // Observez l'état du timer dans le ViewModel
-        val timerState by viewModel.timerState.collectAsState()
-
-        // Calcule le mode sélectionné à partir de l'état actuel
-        val selectedMode = "${timerState.workDuration / 1000 / 60}/${timerState.breakDuration / 1000 / 60}"
-
-        // Observez le nombre de cycles depuis l'état du timer
+        val userPreferences by userPreferencesViewModel.userPreferences.collectAsState()
+        val timerState by doroPomoViewModel.timerState.collectAsState()
         val numberOfCycles = timerState.cyclesBeforeLongBreak
 
         var longBreakDuration by remember { mutableIntStateOf(15) }
         var dontDisturbMode by remember { mutableStateOf(false) }
+
+        val currentMode = remember {
+            mutableStateOf(
+                predefinedModes.find {
+                    it.workDuration == userPreferences.workDuration &&
+                            it.breakDuration == userPreferences.breakDuration
+                } ?: predefinedModes.first()
+            )
+        }
 
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -54,25 +58,17 @@
                 HeaderSection(onBackClick)
 
                 ModeSelector(
-                    selectedMode = selectedMode,
-                    onModeSelected = { modeLabel ->
-                        // Mettre à jour les préférences dans le ViewModel
-                        val (work, breakTime) = modeLabel.split("/").map { it.toLong() * 60 * 1000 }
-                        viewModel.updateTimerPreferences(work, breakTime, numberOfCycles)
+                    selectedMode = currentMode.value,
+                    onModeSelected = { mode ->
+                        currentMode.value = mode
                     }
                 )
 
                 CycleSelector(
                     numberOfCycles = numberOfCycles,
                     onIncrement = {
-                        val updatedCycle = numberOfCycles + 1
-                        viewModel.updateCycleCount(updatedCycle)
                     },
                     onDecrement = {
-                        if (numberOfCycles > 1) {
-                            val updatedCycle = numberOfCycles - 1
-                            viewModel.updateCycleCount(updatedCycle)
-                        }
                     }
                 )
 
@@ -82,17 +78,24 @@
 
                 CustomizeTimerButton()
 
-                SaveButton {
-                    // Sauvegarder le mode sélectionné et les cycles dans les préférences
-                    val selectedPomodoroMode = predefinedModes.first { it.label == selectedMode }
-                    viewModel.savePomodoroPreferences(selectedPomodoroMode, numberOfCycles)
+                SaveButton(){
+                    userPreferencesViewModel.savePreferences(
+                        userPreferences.copy(
+                            workDuration = currentMode.value.workDuration,
+                            breakDuration = currentMode.value.breakDuration
+                        )
+                    )
+                    doroPomoViewModel.resetTimer()
                     onSaveClick()
+                    Log.d("Verify", "SelectModeScreen, Preferences saved: ${userPreferences.copy(
+                        workDuration = currentMode.value.workDuration,
+                        breakDuration = currentMode.value.breakDuration
+                    )}")
                 }
             }
         }
     }
 
-    // En-tête de l'écran Settings
     @Composable
     fun HeaderSection(onBackClick: () -> Unit) {
         Row(
@@ -115,13 +118,12 @@
         }
     }
 
-    // Work / Pause mode selector
     @Composable
     fun ModeSelector(
-        selectedMode: String,
-        onModeSelected: (String) -> Unit
+        selectedMode: PomodoroMode?,
+        onModeSelected: (PomodoroMode) -> Unit
     ) {
-        val modes = listOf("25/5", "50/10", "90/20")
+        val modes = predefinedModes
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -130,7 +132,7 @@
         ) {
             modes.forEach { mode ->
                 SelectableButton(
-                    text = mode,
+                    text = mode.label,
                     isSelected = selectedMode == mode,
                     onClick = { onModeSelected(mode) }
                 )
@@ -138,7 +140,6 @@
         }
     }
 
-    // Long Break Selector
     @Composable
     fun LongBreakTimeSelector(
         selectedDuration: Int,
@@ -161,7 +162,6 @@
         }
     }
 
-    // Checkbox for "Don't Disturb" mode
     @Composable
     fun DontDisturbModeCheckbox(
         dontDisturbMode: Boolean,
@@ -179,7 +179,6 @@
         }
     }
 
-    // Timer Button
     @Composable
     fun CustomizeTimerButton() {
         Button(
@@ -192,7 +191,6 @@
         }
     }
 
-    // Save Button
     @Composable
     fun SaveButton(onSaveClick: () -> Unit) {
         Button(

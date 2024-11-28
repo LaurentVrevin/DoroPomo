@@ -1,14 +1,14 @@
 package com.laurentvrevin.doropomo.domain.usecase.timer
 
 import com.laurentvrevin.doropomo.domain.entity.TimerState
-import com.laurentvrevin.doropomo.domain.repository.TimerRepository
+import com.laurentvrevin.doropomo.domain.repository.TimerStateRepository
 import com.laurentvrevin.doropomo.domain.usecase.alarm.StopAlarmUseCase
 import com.laurentvrevin.doropomo.domain.usecase.alarm.PlayAlarmUseCase
 
 class FinishTimerUseCase(
     private val playAlarmUseCase: PlayAlarmUseCase,
     private val stopAlarmUseCase: StopAlarmUseCase,
-    private val timerRepository: TimerRepository
+    private val timerStateRepository: TimerStateRepository
 ) {
     fun execute(currentState: TimerState): TimerState {
         // Jouer l'alarme
