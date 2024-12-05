@@ -1,23 +1,22 @@
     package com.laurentvrevin.doropomo.presentation.screens
 
-    import android.util.Log
     import androidx.compose.foundation.layout.*
-    import androidx.compose.foundation.shape.RoundedCornerShape
     import androidx.compose.material.icons.Icons
     import androidx.compose.material.icons.automirrored.filled.ArrowBack
     import androidx.compose.material3.*
     import androidx.compose.runtime.*
     import androidx.compose.ui.Alignment
     import androidx.compose.ui.Modifier
-    import androidx.compose.ui.graphics.Color
     import androidx.compose.ui.text.font.FontWeight
     import androidx.compose.ui.unit.dp
     import androidx.compose.ui.unit.sp
-    import com.laurentvrevin.doropomo.domain.entity.PomodoroMode
-    import com.laurentvrevin.doropomo.domain.entity.predefinedModes
+    import com.laurentvrevin.doropomo.domain.model.PomodoroMode
+    import com.laurentvrevin.doropomo.domain.model.predefinedModes
     import com.laurentvrevin.doropomo.presentation.components.CycleSelector
+    import com.laurentvrevin.doropomo.presentation.components.NormalButtonWithBorder
+    import com.laurentvrevin.doropomo.presentation.components.NormalButtonWithoutBorder
     import com.laurentvrevin.doropomo.presentation.components.SelectableButton
-    import com.laurentvrevin.doropomo.presentation.viewmodel.DoroPomoViewModel
+    import com.laurentvrevin.doropomo.presentation.viewmodel.TimerStateViewModel
     import com.laurentvrevin.doropomo.presentation.viewmodel.UserPreferencesViewModel
     import com.laurentvrevin.doropomo.ui.theme.Dimens
 
@@ -25,12 +24,12 @@
     fun SelectModeScreen(
         onBackClick: () -> Unit,
         onSaveClick: () -> Unit,
-        doroPomoViewModel: DoroPomoViewModel,
+        timerStateViewModel: TimerStateViewModel,
         userPreferencesViewModel: UserPreferencesViewModel
     ) {
         val userPreferences by userPreferencesViewModel.userPreferences.collectAsState()
-        val timerState by doroPomoViewModel.timerState.collectAsState()
-        val numberOfCycles = timerState.cyclesBeforeLongBreak
+        val timerState by timerStateViewModel.timerState.collectAsState()
+        //val numberOfCycles = timerState.cyclesBeforeLongBreak
 
         var longBreakDuration by remember { mutableIntStateOf(15) }
         var dontDisturbMode by remember { mutableStateOf(false) }
@@ -45,7 +44,8 @@
         }
 
         Surface(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
             Column(
@@ -64,13 +64,13 @@
                     }
                 )
 
-                CycleSelector(
+                /*CycleSelector(
                     numberOfCycles = numberOfCycles,
                     onIncrement = {
                     },
                     onDecrement = {
                     }
-                )
+                )*/
 
                 LongBreakTimeSelector(longBreakDuration) { longBreakDuration = it }
 
@@ -78,20 +78,17 @@
 
                 CustomizeTimerButton()
 
-                SaveButton(){
+                SaveButton {
                     userPreferencesViewModel.savePreferences(
                         userPreferences.copy(
                             workDuration = currentMode.value.workDuration,
                             breakDuration = currentMode.value.breakDuration
                         )
                     )
-                    doroPomoViewModel.resetTimer()
+                    timerStateViewModel.resetTimer()
                     onSaveClick()
-                    Log.d("Verify", "SelectModeScreen, Preferences saved: ${userPreferences.copy(
-                        workDuration = currentMode.value.workDuration,
-                        breakDuration = currentMode.value.breakDuration
-                    )}")
                 }
+                Spacer(modifier = Modifier.padding(16.dp))
             }
         }
     }
@@ -181,26 +178,20 @@
 
     @Composable
     fun CustomizeTimerButton() {
-        Button(
-            onClick = { /* Logique pour personnaliser le timer */ },
-            shape = RoundedCornerShape(50),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-            modifier = Modifier.padding(vertical = 16.dp)
-        ) {
-            Text(text = "Customize timer", color = Color.Red)
-        }
+        NormalButtonWithBorder(
+            text = "Customize timer",
+            onClick = {},
+            modifier = Modifier
+                .fillMaxWidth()
+        )
     }
 
     @Composable
-    fun SaveButton(onSaveClick: () -> Unit) {
-        Button(
+    fun SaveButton(onSaveClick: () -> Unit){
+        NormalButtonWithoutBorder(
+            text = "Save",
             onClick = onSaveClick,
-            shape = RoundedCornerShape(50),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 16.dp)
-        ) {
-            Text(text = "Save", color = Color.White)
-        }
+        )
     }

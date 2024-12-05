@@ -1,6 +1,6 @@
 package com.laurentvrevin.doropomo.presentation.screens
 
-
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
@@ -20,36 +20,38 @@ import com.laurentvrevin.doropomo.presentation.components.CustomTextButton
 import com.laurentvrevin.doropomo.presentation.components.SettingsButton
 import com.laurentvrevin.doropomo.presentation.components.StartPauseTimerButton
 import com.laurentvrevin.doropomo.presentation.components.ThemeSwitchButton
-import com.laurentvrevin.doropomo.presentation.viewmodel.DoroPomoViewModel
+import com.laurentvrevin.doropomo.presentation.viewmodel.TimerStateViewModel
 import com.laurentvrevin.doropomo.presentation.viewmodel.UserPreferencesViewModel
 import com.laurentvrevin.doropomo.ui.theme.Dimens
 
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun TimerScreen(
-    doroPomoViewModel: DoroPomoViewModel,
+    timerStateViewModel: TimerStateViewModel,
     userPreferencesViewModel: UserPreferencesViewModel,
     onSelectModeClick: () -> Unit,
 ) {
-    // Observez le timerState et l'indicateur modeUpdated
-    val timerState by doroPomoViewModel.timerState.collectAsState()
 
+    val timerState by timerStateViewModel.timerState.collectAsState()
+    val isRunning by timerStateViewModel.isRunning.collectAsState()
+
+    // Récupération des valeurs depuis le timerState
     val workDuration = timerState.workDuration
     val remainingTime = timerState.remainingTime
     val cyclesBeforeLongBreak = timerState.cyclesBeforeLongBreak
-    val isRunning = timerState.isRunning
 
-    val isDarkTheme by doroPomoViewModel.isDarkTheme
-    Log.d("Verify", " TimerScreen, workDuration: $workDuration, remainingTime: $remainingTime, cyclesBeforeLongBreak: $cyclesBeforeLongBreak, isRunning: $isRunning, isDarkTheme: $isDarkTheme")
-
+    val isDarkTheme by userPreferencesViewModel.isDarkTheme
     val userPreferences by userPreferencesViewModel.userPreferences.collectAsState()
-    // Synchronise les préférences utilisateur avec le TimerState
+
     LaunchedEffect(userPreferences) {
-        doroPomoViewModel.observePreferences(userPreferencesViewModel.userPreferences)
+        timerStateViewModel.observePreferences(userPreferencesViewModel.userPreferences)
     }
 
     Surface(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize(),
+
         color = MaterialTheme.colorScheme.background
     ) {
         Column(
@@ -61,22 +63,22 @@ fun TimerScreen(
         ) {
             TimerHeader(
                 isDarkTheme = isDarkTheme,
-                onThemeSwitch = { doroPomoViewModel.toggleTheme() },
+                onThemeSwitch = { userPreferencesViewModel.toggleTheme() },
                 onSettingButtonClick = { onSelectModeClick() }
             )
+            // Ajout de logs pour vérifier les données
+            Log.d("VERIFY", "Remaining time: $remainingTime, Work duration: $workDuration")
 
             TimerBody(
                 progression = if (workDuration > 0) remainingTime / workDuration.toFloat() else 0f,
                 remainingTime = remainingTime,
                 onStartPauseClick = {
-                    if (isRunning) {
-                        doroPomoViewModel.pauseTimer()
-                    } else {
-                        doroPomoViewModel.startTimer()
-                    }
+                    if (isRunning) timerStateViewModel.pauseCountdown()
+                    else timerStateViewModel.startCountdown()
                 },
                 isRunning = isRunning
             )
+
             Spacer(modifier = Modifier.padding(16.dp))
             Text(
                 text = "Cycles avant pause longue : $cyclesBeforeLongBreak",
@@ -85,7 +87,7 @@ fun TimerScreen(
             )
 
             TimerFooter(
-                onStopClick = { doroPomoViewModel.resetTimer() }
+                onStopClick = { timerStateViewModel.resetCountDown() }
             )
         }
     }

@@ -1,14 +1,12 @@
 package com.laurentvrevin.doropomo.domain.usecase.timer
 
-import com.laurentvrevin.doropomo.domain.entity.TimerState
+import com.laurentvrevin.doropomo.domain.model.TimerState
 import com.laurentvrevin.doropomo.domain.repository.TimerStateRepository
 import com.laurentvrevin.doropomo.domain.usecase.alarm.PlayAlarmUseCase
 import kotlinx.coroutines.delay
 
 class StartTimerUseCase(
     private val timerStateRepository: TimerStateRepository,
-    private val updateTimerStateUseCase: UpdateTimerStateUseCase,
-    private val playAlarmUseCase: PlayAlarmUseCase
 ) {
     suspend operator fun invoke(
         timerState: TimerState,
@@ -16,25 +14,22 @@ class StartTimerUseCase(
         onFinish: () -> Unit
     ) {
         var currentState = timerStateRepository.startTimer(timerState.remainingTime)
-        onTick(currentState)
-
-        val startTime = System.currentTimeMillis()
-        var lastUpdateTime = startTime
 
         while (currentState.isRunning && currentState.remainingTime > 0) {
-            val currentTime = System.currentTimeMillis()
-            val elapsed = currentTime - lastUpdateTime
-            if (elapsed >= 1000) {
-                currentState = updateTimerStateUseCase.execute(currentState, 1000)
-                onTick(currentState)
-                lastUpdateTime += 1000
-            }
-            if (!currentState.isRunning || currentState.remainingTime <= 0) {
-                playAlarmUseCase.execute() // Sonner l'alarme
+            val elapsedTime = System.currentTimeMillis() - currentState.startTime
+
+            currentState = currentState.copy(
+                remainingTime = timerState.remainingTime - elapsedTime
+            )
+
+            onTick(currentState)
+
+            if (currentState.remainingTime <= 0) {
                 onFinish()
                 break
             }
-            delay(50)
+
+            delay(1000) // Attente d'une seconde entre chaque mise à jour
         }
     }
 }

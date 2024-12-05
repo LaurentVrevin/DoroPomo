@@ -1,6 +1,6 @@
 package com.laurentvrevin.doropomo.domain.repository
 
-import com.laurentvrevin.doropomo.domain.entity.TimerState
+import com.laurentvrevin.doropomo.domain.model.TimerState
 
 interface TimerStateRepository {
     fun startTimer(duration: Long): TimerState

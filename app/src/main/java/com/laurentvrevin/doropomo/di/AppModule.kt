@@ -1,8 +1,8 @@
 package com.laurentvrevin.doropomo.di
 
 import android.content.Context
-import com.laurentvrevin.doropomo.data.manager.DoNotDisturbManager
-import com.laurentvrevin.doropomo.data.manager.UserPreferencesStorage
+import com.laurentvrevin.doropomo.data.datasource.DoNotDisturbManager
+import com.laurentvrevin.doropomo.data.datasource.UserPreferencesStorage
 import com.laurentvrevin.doropomo.data.repository.AlarmRepositoryImpl
 import com.laurentvrevin.doropomo.data.repository.DoNotDisturbRepositoryImpl
 import com.laurentvrevin.doropomo.data.repository.TimerStateRepositoryImpl
@@ -15,7 +15,7 @@ import com.laurentvrevin.doropomo.domain.usecase.alarm.PlayAlarmUseCase
 import com.laurentvrevin.doropomo.domain.usecase.alarm.StopAlarmUseCase
 import com.laurentvrevin.doropomo.domain.usecase.preferences.GetUserPreferencesUseCase
 import com.laurentvrevin.doropomo.domain.usecase.preferences.SaveUserPreferencesUseCase
-import com.laurentvrevin.doropomo.domain.usecase.preferences.UpdateCycleCountUseCase
+import com.laurentvrevin.doropomo.domain.usecase.preferences.ToggleDoNotDisturbUseCase
 import com.laurentvrevin.doropomo.domain.usecase.timer.*
 import dagger.Module
 import dagger.Provides
@@ -75,10 +75,9 @@ object AppModule {
     @Provides
     fun provideStartTimerUseCase(
         timerStateRepository: TimerStateRepository,
-        updateTimerStateUseCase: UpdateTimerStateUseCase,
-        playAlarmUseCase: PlayAlarmUseCase
+
     ): StartTimerUseCase {
-        return StartTimerUseCase(timerStateRepository, updateTimerStateUseCase, playAlarmUseCase)
+        return StartTimerUseCase(timerStateRepository)
     }
 
     @Singleton
@@ -90,19 +89,17 @@ object AppModule {
     @Singleton
     @Provides
     fun provideResetTimerUseCase(
-        userPreferencesRepository: UserPreferencesRepository
+        timerStateRepository: TimerStateRepository
     ): ResetTimerUseCase {
-        return ResetTimerUseCase(userPreferencesRepository)
+        return ResetTimerUseCase(timerStateRepository)
     }
 
     @Singleton
     @Provides
     fun provideFinishTimerUseCase(
         playAlarmUseCase: PlayAlarmUseCase,
-        stopAlarmUseCase: StopAlarmUseCase,
-        timerStateRepository: TimerStateRepository
     ): FinishTimerUseCase {
-        return FinishTimerUseCase(playAlarmUseCase, stopAlarmUseCase, timerStateRepository)
+        return FinishTimerUseCase(playAlarmUseCase)
     }
 
     @Singleton
@@ -113,23 +110,16 @@ object AppModule {
         return UpdateTimerStateUseCase(timerStateRepository)
     }
 
-    @Singleton
-    @Provides
-    fun provideSetTimerStateUseCase(
-        timerStateRepository: TimerStateRepository
-    ): SetTimerStateUseCase {
-        return SetTimerStateUseCase(timerStateRepository)
-    }
-
     // --- Preferences UseCases ---
     @Singleton
     @Provides
-    fun provideSetTimerPreferencesUseCase(
+    fun provideGetUserPreferencesUseCase(
         userPreferencesRepository: UserPreferencesRepository
     ): GetUserPreferencesUseCase {
         return GetUserPreferencesUseCase(userPreferencesRepository)
     }
 
+    @Singleton
     @Provides
     fun provideSaveUserPreferencesUseCase(
         repository: UserPreferencesRepository
@@ -139,10 +129,10 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideUpdateCycleCountUseCase(
-        userPreferencesRepository: UserPreferencesRepository
-    ): UpdateCycleCountUseCase {
-        return UpdateCycleCountUseCase(userPreferencesRepository)
+    fun provideToggleDoNotDisturbUseCase(
+        doNotDisturbRepository: DoNotDisturbRepository
+    ): ToggleDoNotDisturbUseCase {
+        return ToggleDoNotDisturbUseCase(doNotDisturbRepository)
     }
 
     // --- Alarm UseCases ---

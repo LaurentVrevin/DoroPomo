@@ -1,4 +1,4 @@
-package com.laurentvrevin.doropomo.domain.entity
+package com.laurentvrevin.doropomo.domain.model
 
 data class TimerState(
     val startTime: Long = 0L,

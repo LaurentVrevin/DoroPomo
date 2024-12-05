@@ -1,6 +1,6 @@
     package com.laurentvrevin.doropomo.data.repository
 
-    import com.laurentvrevin.doropomo.domain.entity.TimerState
+    import com.laurentvrevin.doropomo.domain.model.TimerState
     import com.laurentvrevin.doropomo.domain.repository.TimerStateRepository
     import javax.inject.Inject
 
@@ -10,7 +10,6 @@
         override fun startTimer(duration: Long): TimerState {
             timerState = timerState.copy(
                 startTime = System.currentTimeMillis(),
-                remainingTime = duration,
                 isRunning = true
             )
             return timerState
@@ -21,11 +20,16 @@
         }
 
         override fun pauseTimer(): TimerState {
-            val elapsedTime = System.currentTimeMillis() - timerState.startTime
-            timerState = timerState.copy(
-                remainingTime = timerState.remainingTime - elapsedTime,
-                isRunning = false
-            )
+            if (timerState.isRunning) {
+                // Calcule le temps écoulé depuis le démarrage
+                val elapsedTime = System.currentTimeMillis() - timerState.startTime
+
+                timerState = timerState.copy(
+                    remainingTime = timerState.remainingTime - elapsedTime,
+                    isRunning = false,
+                    startTime = 0L // Réinitialise startTime car le timer est en pause
+                )
+            }
             return timerState
         }
 

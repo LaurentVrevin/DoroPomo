@@ -1,4 +1,6 @@
 [versions]
+accompanistNavigationAnimationVersion = "1.0.0"
+accompanistSwiperefreshVersion = "<version>"
 agp = "8.5.0"
 kotlin = "1.9.0"
 coreKtx = "1.13.1"

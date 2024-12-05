@@ -11,7 +11,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.laurentvrevin.doropomo.navigation.Navigation
-import com.laurentvrevin.doropomo.presentation.viewmodel.DoroPomoViewModel
+import com.laurentvrevin.doropomo.presentation.viewmodel.TimerStateViewModel
 import com.laurentvrevin.doropomo.presentation.viewmodel.UserPreferencesViewModel
 import com.laurentvrevin.doropomo.ui.theme.DoropomoTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -23,20 +23,20 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            val doroPomoViewModel: DoroPomoViewModel = hiltViewModel()
+            val timerStateViewModel: TimerStateViewModel = hiltViewModel()
             val userPreferencesViewModel: UserPreferencesViewModel = hiltViewModel()
-            val isDarkTheme by doroPomoViewModel.isDarkTheme
+            val isDarkTheme by userPreferencesViewModel.isDarkTheme
 
             // Connecter les préférences au timer
             LaunchedEffect(Unit) {
-                doroPomoViewModel.observePreferences(userPreferencesViewModel.userPreferences)
+                timerStateViewModel.observePreferences(userPreferencesViewModel.userPreferences)
             }
 
             DoropomoTheme(darkTheme = isDarkTheme) {
                 val navController: NavHostController = rememberNavController()
                 Navigation(
                     navController = navController,
-                    doroPomoViewModel = doroPomoViewModel,
+                    timerStateViewModel = timerStateViewModel,
                     userPreferencesViewModel = userPreferencesViewModel
                 )
             }

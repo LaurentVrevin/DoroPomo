@@ -1,8 +1,8 @@
-package com.laurentvrevin.doropomo.data.manager
+package com.laurentvrevin.doropomo.data.datasource
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.laurentvrevin.doropomo.domain.entity.UserPreferences
+import com.laurentvrevin.doropomo.domain.model.UserPreferences
 
 
 class UserPreferencesStorage(context: Context) {

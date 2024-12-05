@@ -1,4 +1,4 @@
-package com.laurentvrevin.doropomo.domain.entity
+package com.laurentvrevin.doropomo.domain.model
 
 // Représente un mode Pomodoro
 data class PomodoroMode(

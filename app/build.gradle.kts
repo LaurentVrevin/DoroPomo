@@ -68,6 +68,7 @@ dependencies {
     implementation(libs.google.dagger.hilt)
     kapt(libs.google.dagger.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation ("androidx.navigation:navigation-compose:2.8.4")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -1,6 +1,6 @@
 package com.laurentvrevin.doropomo.data.repository
 
-import com.laurentvrevin.doropomo.data.manager.DoNotDisturbManager
+import com.laurentvrevin.doropomo.data.datasource.DoNotDisturbManager
 import com.laurentvrevin.doropomo.domain.repository.DoNotDisturbRepository
 import javax.inject.Inject
 
