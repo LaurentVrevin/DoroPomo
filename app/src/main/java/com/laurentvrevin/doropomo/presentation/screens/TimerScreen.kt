@@ -32,7 +32,6 @@ fun TimerScreen(
     userPreferencesViewModel: UserPreferencesViewModel,
     onSelectModeClick: () -> Unit,
 ) {
-
     val timerState by timerStateViewModel.timerState.collectAsState()
     val isRunning by timerStateViewModel.isRunning.collectAsState()
 

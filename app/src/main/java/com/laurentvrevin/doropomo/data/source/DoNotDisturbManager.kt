@@ -1,4 +1,4 @@
-package com.laurentvrevin.doropomo.data.datasource
+package com.laurentvrevin.doropomo.data.source
 
 import android.app.NotificationManager
 import android.content.Context

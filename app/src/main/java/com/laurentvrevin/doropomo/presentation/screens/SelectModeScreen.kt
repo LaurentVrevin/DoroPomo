@@ -28,8 +28,6 @@
         userPreferencesViewModel: UserPreferencesViewModel
     ) {
         val userPreferences by userPreferencesViewModel.userPreferences.collectAsState()
-        val timerState by timerStateViewModel.timerState.collectAsState()
-        //val numberOfCycles = timerState.cyclesBeforeLongBreak
 
         var longBreakDuration by remember { mutableIntStateOf(15) }
         var dontDisturbMode by remember { mutableStateOf(false) }
@@ -85,7 +83,7 @@
                             breakDuration = currentMode.value.breakDuration
                         )
                     )
-                    timerStateViewModel.resetTimer()
+                    timerStateViewModel.resetCountDown()
                     onSaveClick()
                 }
                 Spacer(modifier = Modifier.padding(16.dp))

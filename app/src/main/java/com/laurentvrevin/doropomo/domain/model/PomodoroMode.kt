@@ -1,13 +1,11 @@
 package com.laurentvrevin.doropomo.domain.model
 
-// Représente un mode Pomodoro
 data class PomodoroMode(
-    val workDuration: Long,  // Durée de travail en millisecondes
-    val breakDuration: Long, // Durée de pause en millisecondes
-    val label: String        // Nom du mode
+    val workDuration: Long,
+    val breakDuration: Long,
+    val label: String
 )
 
-// Liste des modes prédéfinis
 val predefinedModes = listOf(
     PomodoroMode(25 * 60 * 1000L, 5 * 60 * 1000L, "25/5"),
     PomodoroMode(50 * 60 * 1000L, 10 * 60 * 1000L, "50/10"),
