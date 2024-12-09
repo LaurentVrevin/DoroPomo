@@ -150,7 +150,6 @@ fun TimerBody(
                 onClick = onStartPauseClick,
                 verticalArrangement = Arrangement.Center,
             )
-
         }
     }
 }
@@ -168,7 +167,6 @@ fun formatTime(timeInMillis: Long): String {
 @Composable
 fun TimerFooter(
     onStopClick: () -> Unit,
-
     ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally

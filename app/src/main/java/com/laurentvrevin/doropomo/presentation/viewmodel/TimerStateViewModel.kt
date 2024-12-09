@@ -32,12 +32,14 @@ class TimerStateViewModel @Inject constructor(
             preferencesFlow.collect { preferences ->
 
                 if (_timerState.value.workDuration != preferences.workDuration ||
-                    _timerState.value.breakDuration != preferences.breakDuration
+                    _timerState.value.breakDuration != preferences.breakDuration ||
+                    _timerState.value.cyclesBeforeLongBreak != preferences.cyclesBeforeLongBreak
                 ) {
                     _timerState.value = _timerState.value.copy(
                         workDuration = preferences.workDuration,
                         breakDuration = preferences.breakDuration,
-                        remainingTime = preferences.workDuration
+                        remainingTime = preferences.workDuration,
+                        cyclesBeforeLongBreak = preferences.cyclesBeforeLongBreak
                     )
 
                     if (_isRunning.value) {
@@ -69,7 +71,6 @@ class TimerStateViewModel @Inject constructor(
                 playAlarm()
             }
         }
-
         timer?.start()
         _isRunning.value = true
     }
@@ -86,7 +87,6 @@ class TimerStateViewModel @Inject constructor(
         )
         _isRunning.value = false
     }
-
 
     private fun playAlarm() {
         playAlarmUseCase.execute()

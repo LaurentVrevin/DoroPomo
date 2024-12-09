@@ -29,6 +29,7 @@
     ) {
         val userPreferences by userPreferencesViewModel.userPreferences.collectAsState()
 
+        var numberOfCycles by remember { mutableIntStateOf(userPreferences.cyclesBeforeLongBreak) }
         var longBreakDuration by remember { mutableIntStateOf(15) }
         var dontDisturbMode by remember { mutableStateOf(false) }
 
@@ -62,13 +63,15 @@
                     }
                 )
 
-                /*CycleSelector(
+                CycleSelector(
                     numberOfCycles = numberOfCycles,
                     onIncrement = {
+                        numberOfCycles++
                     },
                     onDecrement = {
+                        numberOfCycles--
                     }
-                )*/
+                )
 
                 LongBreakTimeSelector(longBreakDuration) { longBreakDuration = it }
 
@@ -80,7 +83,8 @@
                     userPreferencesViewModel.savePreferences(
                         userPreferences.copy(
                             workDuration = currentMode.value.workDuration,
-                            breakDuration = currentMode.value.breakDuration
+                            breakDuration = currentMode.value.breakDuration,
+                            cyclesBeforeLongBreak = numberOfCycles,
                         )
                     )
                     timerStateViewModel.resetCountDown()
