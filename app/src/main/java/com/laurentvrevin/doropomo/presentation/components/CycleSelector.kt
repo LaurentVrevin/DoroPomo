@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
@@ -31,7 +32,8 @@ fun CycleSelector(
     ) {
         OutlinedButton(
             onClick = onDecrement,
-            modifier = Modifier,
+            modifier = Modifier
+                .size(width = 60.dp, height = 60.dp),
             border = BorderStroke(2.dp, LightPrimary),
             colors = ButtonDefaults.outlinedButtonColors(
                 contentColor = LightPrimary),
@@ -51,7 +53,8 @@ fun CycleSelector(
 
         OutlinedButton(
             onClick = onIncrement,
-            modifier = Modifier,
+            modifier = Modifier
+                .size(width = 60.dp, height = 60.dp),
             border = BorderStroke(2.dp, LightPrimary),
             colors = ButtonDefaults.outlinedButtonColors(
                 contentColor = LightPrimary),

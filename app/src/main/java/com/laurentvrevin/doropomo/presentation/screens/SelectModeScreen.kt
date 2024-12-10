@@ -56,6 +56,10 @@
             ) {
                 HeaderSection(onBackClick)
 
+                Spacer(modifier = Modifier.padding(16.dp))
+
+
+
                 ModeSelector(
                     selectedMode = currentMode.value,
                     onModeSelected = { mode ->
@@ -123,6 +127,16 @@
         onModeSelected: (PomodoroMode) -> Unit
     ) {
         val modes = predefinedModes
+
+        Text(
+            modifier = Modifier.padding(8.dp),
+            text = "Choose the pomodoro mode that suits you in minutes :",
+            fontSize = 12.sp)
+        Text(
+            modifier = Modifier.padding(8.dp),
+            text = "Work duration / Break duration",
+            fontSize = 12.sp)
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -171,7 +185,12 @@
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(text = "Don’t disturb mode", modifier = Modifier.weight(1f))
+
             Checkbox(
+                modifier = Modifier
+                    .weight(0.15f)
+                    .padding(Dimens.Button.paddingMedium),
+                colors = CheckboxDefaults.colors(uncheckedColor = MaterialTheme.colorScheme.primary),
                 checked = dontDisturbMode,
                 onCheckedChange = { onCheckedChange(it) }
             )
