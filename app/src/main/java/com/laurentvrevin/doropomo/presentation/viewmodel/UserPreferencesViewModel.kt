@@ -15,7 +15,8 @@ import javax.inject.Inject
 @HiltViewModel
 class UserPreferencesViewModel @Inject constructor(
     private val getUserPreferencesUseCase: GetUserPreferencesUseCase,
-    private val saveUserPreferencesUseCase: SaveUserPreferencesUseCase
+    private val saveUserPreferencesUseCase: SaveUserPreferencesUseCase,
+    private val redirectFocusModeUseCase: RedirectFocusModeUseCase
 ): ViewModel() {
 
     val isDarkTheme = mutableStateOf(false)
@@ -39,4 +40,9 @@ class UserPreferencesViewModel @Inject constructor(
     fun toggleTheme() {
         isDarkTheme.value = !isDarkTheme.value
     }
+
+    fun redirectToFocusModeSettings() {
+        redirectFocusModeUseCase.execute()
+    }
+
 }

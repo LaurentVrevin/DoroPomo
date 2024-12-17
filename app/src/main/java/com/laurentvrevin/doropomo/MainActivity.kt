@@ -27,7 +27,6 @@ class MainActivity : ComponentActivity() {
             val userPreferencesViewModel: UserPreferencesViewModel = hiltViewModel()
             val isDarkTheme by userPreferencesViewModel.isDarkTheme
 
-            // Connecter les préférences au timer
             LaunchedEffect(Unit) {
                 timerStateViewModel.observePreferences(userPreferencesViewModel.userPreferences)
             }

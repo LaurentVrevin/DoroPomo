@@ -1,5 +1,8 @@
     package com.laurentvrevin.doropomo.presentation.screens
 
+    import android.content.Context
+    import android.content.Intent
+    import android.provider.Settings
     import androidx.compose.foundation.layout.*
     import androidx.compose.material.icons.Icons
     import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -7,6 +10,7 @@
     import androidx.compose.runtime.*
     import androidx.compose.ui.Alignment
     import androidx.compose.ui.Modifier
+    import androidx.compose.ui.platform.LocalContext
     import androidx.compose.ui.text.font.FontWeight
     import androidx.compose.ui.unit.dp
     import androidx.compose.ui.unit.sp
@@ -31,7 +35,8 @@
 
         var numberOfCycles by remember { mutableIntStateOf(userPreferences.cyclesBeforeLongBreak) }
         var longBreakDuration by remember { mutableIntStateOf(15) }
-        var dontDisturbMode by remember { mutableStateOf(false) }
+
+        val context = LocalContext.current
 
         val currentMode = remember {
             mutableStateOf(
@@ -58,8 +63,6 @@
 
                 Spacer(modifier = Modifier.padding(16.dp))
 
-
-
                 ModeSelector(
                     selectedMode = currentMode.value,
                     onModeSelected = { mode ->
@@ -79,7 +82,14 @@
 
                 LongBreakTimeSelector(longBreakDuration) { longBreakDuration = it }
 
-                DontDisturbModeCheckbox(dontDisturbMode) { dontDisturbMode = it }
+                DontDisturbModeButton(
+                    onDndPermissionRequested = {
+                        requestDndPermission(context)
+                    }
+                )
+
+                Text("Focus Mode", style = MaterialTheme.typography.displayLarge)
+
 
                 CustomizeTimerButton()
 
@@ -89,8 +99,10 @@
                             workDuration = currentMode.value.workDuration,
                             breakDuration = currentMode.value.breakDuration,
                             cyclesBeforeLongBreak = numberOfCycles,
+
                         )
                     )
+
                     timerStateViewModel.resetCountDown()
                     onSaveClick()
                 }
@@ -176,26 +188,71 @@
     }
 
     @Composable
-    fun DontDisturbModeCheckbox(
-        dontDisturbMode: Boolean,
-        onCheckedChange: (Boolean) -> Unit
+    fun DontDisturbModeButton(
+        onDndPermissionRequested: () -> Unit
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(text = "Don’t disturb mode", modifier = Modifier.weight(1f))
+        var showDialog by remember { mutableStateOf(false) }
 
-            Checkbox(
-                modifier = Modifier
-                    .weight(0.15f)
-                    .padding(Dimens.Button.paddingMedium),
-                colors = CheckboxDefaults.colors(uncheckedColor = MaterialTheme.colorScheme.primary),
-                checked = dontDisturbMode,
-                onCheckedChange = { onCheckedChange(it) }
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Activer le Focus Mode",
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            Button(
+                onClick = { showDialog = true },
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+            ) {
+                Text("Configurer le mode Ne Pas Déranger")
+            }
+        }
+
+        if (showDialog) {
+            ShowDndPermissionDialog(
+                onDismiss = { showDialog = false },
+                onOpenSettings = {
+                    onDndPermissionRequested()
+                    showDialog = false
+                }
             )
         }
     }
+
+    @Composable
+    fun ShowDndPermissionDialog(
+        onDismiss: () -> Unit,
+        onOpenSettings: () -> Unit
+    ) {
+        AlertDialog(
+            onDismissRequest = { onDismiss() },
+            title = { Text("Activer le Focus Mode") },
+            text = {
+                Text(
+                    "Pour activer le Focus Mode, veuillez accorder l'accès au mode \"Ne Pas Déranger\" à Doropomo dans les paramètres. " +
+                            "Cela permettra de bloquer les notifications pendant vos sessions de concentration."
+                )
+            },
+            confirmButton = {
+                Button(onClick = { onOpenSettings() }) {
+                    Text("Ouvrir les Paramètres")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { onDismiss() }) {
+                    Text("Annuler")
+                }
+            }
+        )
+    }
+    fun requestDndPermission(context: Context) {
+        val intent = Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)
+        context.startActivity(intent)
+    }
+
 
     @Composable
     fun CustomizeTimerButton() {

@@ -1,19 +1,15 @@
 package com.laurentvrevin.doropomo.di
 
 import android.content.Context
-import com.laurentvrevin.doropomo.data.source.DoNotDisturbManager
 import com.laurentvrevin.doropomo.data.source.UserPreferencesStorage
 import com.laurentvrevin.doropomo.data.repository.AlarmRepositoryImpl
-import com.laurentvrevin.doropomo.data.repository.DoNotDisturbRepositoryImpl
 import com.laurentvrevin.doropomo.data.repository.UserPreferencesRepositoryImpl
 import com.laurentvrevin.doropomo.domain.repository.AlarmRepository
-import com.laurentvrevin.doropomo.domain.repository.DoNotDisturbRepository
 import com.laurentvrevin.doropomo.domain.repository.UserPreferencesRepository
 import com.laurentvrevin.doropomo.domain.usecase.alarm.PlayAlarmUseCase
 import com.laurentvrevin.doropomo.domain.usecase.alarm.StopAlarmUseCase
 import com.laurentvrevin.doropomo.domain.usecase.preferences.GetUserPreferencesUseCase
 import com.laurentvrevin.doropomo.domain.usecase.preferences.SaveUserPreferencesUseCase
-import com.laurentvrevin.doropomo.domain.usecase.preferences.ToggleDoNotDisturbUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -26,11 +22,6 @@ import javax.inject.Singleton
 object AppModule {
 
     // --- Source ---
-    @Singleton
-    @Provides
-    fun provideDoNotDisturbManager(@ApplicationContext context: Context): DoNotDisturbManager {
-        return DoNotDisturbManager(context)
-    }
 
     @Singleton
     @Provides
@@ -39,11 +30,6 @@ object AppModule {
     }
 
     // --- Repositories ---
-    /*@Singleton
-    @Provides
-    fun provideTimerStateRepository(): TimerStateRepository {
-        return TimerStateRepositoryImpl()
-    }*/
 
     @Singleton
     @Provides
@@ -55,21 +41,11 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun provideDoNotDisturbRepository(
-        doNotDisturbManager: DoNotDisturbManager
-    ): DoNotDisturbRepository {
-        return DoNotDisturbRepositoryImpl(doNotDisturbManager)
-    }
-
-    @Singleton
-    @Provides
     fun provideAlarmRepository(@ApplicationContext context: Context): AlarmRepository {
         return AlarmRepositoryImpl(context)
     }
 
     // --- Timer UseCases ---
-
-
 
     // --- Preferences UseCases ---
     @Singleton
@@ -86,14 +62,6 @@ object AppModule {
         repository: UserPreferencesRepository
     ): SaveUserPreferencesUseCase {
         return SaveUserPreferencesUseCase(repository)
-    }
-
-    @Singleton
-    @Provides
-    fun provideToggleDoNotDisturbUseCase(
-        doNotDisturbRepository: DoNotDisturbRepository
-    ): ToggleDoNotDisturbUseCase {
-        return ToggleDoNotDisturbUseCase(doNotDisturbRepository)
     }
 
     // --- Alarm UseCases ---
